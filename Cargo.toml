@@ -5,7 +5,7 @@ edition = "2021"
 description = """
 X.509 Verify
 
-Pure Rust library that Verifies X.509 signatures based on the OIDs
+Pure Rust library that verifies X.509 signatures based on the OIDs
 """
 
 [dependencies]
@@ -47,7 +47,7 @@ p192 = [ "sha2", "dep:ecdsa", "dep:p192" ]
 p224 = [ "sha2", "dep:ecdsa", "dep:p224" ]
 p256 = [ "sha2", "dep:ecdsa", "dep:p256" ]
 p384 = [ "sha2", "dep:ecdsa", "dep:p384" ]
-all = [ "dsa", "ecc", "md2", "md5", "sha1", "rsa" ]
+all = [ "md2", "md5", "sha1", "dsa", "rsa", "ecc" ]
 
 [package.metadata.docs.rs]
 all-features = true
