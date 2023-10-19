@@ -34,13 +34,13 @@ rand = { version = "0.8.5" }
 rand_chacha = { version = "0.3.1" }
 
 [features]
-default = [ "rsa", "k256", "p256", "p384", "sha2" ]
-dsa = [ "dep:dsa" ]
-rsa = [ "dep:rsa" ]
+default = [ "sha2", "rsa", "k256", "p256", "p384" ]
 md2 = [ "dep:md2" ]
 md5 = [ "dep:md5" ]
 sha1 = [ "dep:sha1" ]
 sha2 = [ "dep:sha2" ]
+dsa = [ "dep:dsa" ]
+rsa = [ "dep:rsa" ]
 ecc = [ "k256", "p192", "p224", "p256", "p384" ]
 k256 = [ "sha2", "dep:ecdsa", "dep:k256" ]
 p192 = [ "sha2", "dep:ecdsa", "dep:p192" ]
