@@ -2,7 +2,53 @@
 name = "x509-verify"
 version = "0.1.0"
 edition = "2021"
+description = """
+X.509 Verify
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+Pure Rust library that Verifies X.509 signatures based on the OIDs
+"""
 
 [dependencies]
+const-oid = { version = "0.9.5", default-features = false, features = ["db"] }
+der = { version = "0.7.8", default-features = false, features = ["alloc", "derive", "flagset", "oid"] }
+rand_core = { version = "0.6.4", default-features = false }
+signature = { version = "2.1.0", default-features = false, features = ["digest", "rand_core"] }
+spki = { version = "0.7.2", default-features = false, features = ["alloc"] }
+
+# optional dependencies
+md2 = { version = "0.10.2", optional = true, default-features = false }
+md5 = { version = "0.7.0", optional = true, default-features = false }
+sha1 = { version = "0.10.6", optional = true, default-features = false }
+sha2 = { version = "0.10.8", optional = true, default-features = false }
+rsa = { version = "0.9.2", optional = true, default-features = false }
+dsa = { version = "0.6.1", optional = true, default-features = false }
+ecdsa = { version = "0.16.8", optional = true, default-features = false, features = ["signing", "verifying"] }
+k256 = { version = "0.13.1", optional = true, default-features = false, features = ["ecdsa"] }
+p192 = { version = "0.13.0", optional = true, default-features = false, features = ["ecdsa"] }
+p224 = { version = "0.13.2", optional = true, default-features = false, features = ["ecdsa"] }
+p256 = { version = "0.13.2", optional = true, default-features = false, features = ["ecdsa"] }
+p384 = { version = "0.13.0", optional = true, default-features = false, features = ["ecdsa"] }
+
+[dev-dependencies]
+rand = { version = "0.8.5" }
+rand_chacha = { version = "0.3.1" }
+
+[features]
+default = [ "rsa", "k256", "p256", "p384", "sha2" ]
+dsa = [ "dep:dsa" ]
+rsa = [ "dep:rsa" ]
+md2 = [ "dep:md2" ]
+md5 = [ "dep:md5" ]
+sha1 = [ "dep:sha1" ]
+sha2 = [ "dep:sha2" ]
+ecc = [ "k256", "p192", "p224", "p256", "p384" ]
+k256 = [ "sha2", "dep:ecdsa", "dep:k256" ]
+p192 = [ "sha2", "dep:ecdsa", "dep:p192" ]
+p224 = [ "sha2", "dep:ecdsa", "dep:p224" ]
+p256 = [ "sha2", "dep:ecdsa", "dep:p256" ]
+p384 = [ "sha2", "dep:ecdsa", "dep:p384" ]
+all = [ "dsa", "ecc", "md2", "md5", "sha1", "rsa" ]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
