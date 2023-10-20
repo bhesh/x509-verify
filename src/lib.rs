@@ -15,9 +15,7 @@
 pub mod error;
 
 mod verifier;
-
 pub use verifier::X509Verifier;
 
 mod signature;
-
 pub use signature::X509Signature;
