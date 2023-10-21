@@ -1,21 +1,21 @@
-//! Verification errors
+//! Verification Errors
 
 use der::asn1::ObjectIdentifier;
 
 pub enum Error {
-    /// Invalid Signature
+    /// Verification Error
+    Verification,
+
+    /// Invalid Key
     InvalidKey,
 
     /// Invalid Signature
     InvalidSignature,
 
-    /// Verification Error
-    Verification,
-
     /// Unknown OID
     UnknownOid(ObjectIdentifier),
 
-    /// DER/ASN.1 Encoding Error
+    /// Encoding Error
     Encoding,
 }
 
