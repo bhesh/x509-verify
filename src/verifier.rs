@@ -2,12 +2,9 @@
 
 use crate::X509Signature;
 use core::result::Result;
-use der::{
-    asn1::{BitString, ObjectIdentifier},
-    Any,
-};
+use der::asn1::ObjectIdentifier;
 use signature::{digest::Digest, hazmat::PrehashVerifier, DigestVerifier, Verifier};
-use spki::SubjectPublicKeyInfo;
+use spki::SubjectPublicKeyInfoRef;
 
 #[cfg(feature = "md2")]
 use md2::Md2;
@@ -76,7 +73,7 @@ use const_oid::db::rfc5912::SECP_256_R_1;
 use const_oid::db::rfc5912::SECP_384_R_1;
 
 pub struct X509Verifier<'a> {
-    key_info: &'a SubjectPublicKeyInfo<Any, BitString>,
+    key_info: SubjectPublicKeyInfoRef<'a>,
 }
 
 impl<'a> PrehashVerifier<X509Signature<'_>> for X509Verifier<'a> {
@@ -85,7 +82,39 @@ impl<'a> PrehashVerifier<X509Signature<'_>> for X509Verifier<'a> {
         prehash: &[u8],
         signature: &X509Signature<'_>,
     ) -> Result<(), signature::Error> {
-        unimplemented!()
+        match signature.oid() {
+            #[cfg(all(feature = "rsa", feature = "md2"))]
+            &MD_2_WITH_RSA_ENCRYPTION => unimplemented!(),
+
+            #[cfg(all(feature = "rsa", feature = "md5"))]
+            &MD_5_WITH_RSA_ENCRYPTION => unimplemented!(),
+
+            #[cfg(all(feature = "dsa", feature = "sha1"))]
+            &DSA_WITH_SHA_1 => unimplemented!(),
+
+            #[cfg(all(feature = "rsa", feature = "sha1"))]
+            &SHA_1_WITH_RSA_ENCRYPTION => unimplemented!(),
+
+            #[cfg(all(feature = "rsa", feature = "sha2"))]
+            &SHA_224_WITH_RSA_ENCRYPTION
+            | &SHA_256_WITH_RSA_ENCRYPTION
+            | &SHA_384_WITH_RSA_ENCRYPTION
+            | &SHA_512_WITH_RSA_ENCRYPTION => unimplemented!(),
+
+            #[cfg(feature = "sha2")]
+            #[cfg(any(
+                feature = "k256",
+                feature = "p192",
+                feature = "p224",
+                feature = "p256",
+                feature = "p384"
+            ))]
+            &ECDSA_WITH_SHA_224 | &ECDSA_WITH_SHA_256 | &ECDSA_WITH_SHA_384
+            | &ECDSA_WITH_SHA_512 => unimplemented!(),
+
+            // Deliberately empty error by signature crate...
+            _ => Err(signature::Error::default()),
+        }
     }
 }
 
