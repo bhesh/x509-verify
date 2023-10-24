@@ -1,25 +1,83 @@
 //! Generic X.509 Verifier
 
-use crate::{error::Error, X509Digest, X509Signature};
-use alloc::format;
+use crate::{error::Error, X509Signature};
+use alloc::boxed::Box;
 use core::result::Result;
-use der::{asn1::ObjectIdentifier, referenced::OwnedToRef};
-use signature::{digest::Digest, hazmat::PrehashVerifier, DigestVerifier, Verifier};
+use der::referenced::OwnedToRef;
 use spki::{SubjectPublicKeyInfoOwned, SubjectPublicKeyInfoRef};
 
-//#[cfg(feature = "rsa")]
-//mod rsa;
+#[cfg(feature = "dsa")]
+use const_oid::db::rfc5912::ID_DSA;
 
-pub struct X509Verifier;
+#[cfg(feature = "dsa")]
+mod dsa;
+
+#[cfg(feature = "rsa")]
+use const_oid::db::rfc5912::RSA_ENCRYPTION;
+
+#[cfg(feature = "rsa")]
+mod rsa;
+
+#[cfg(any(
+    feature = "k256",
+    feature = "p192",
+    feature = "p224",
+    feature = "p256",
+    feature = "p384"
+))]
+use const_oid::db::rfc5912::ID_EC_PUBLIC_KEY;
+
+#[cfg(any(
+    feature = "k256",
+    feature = "p192",
+    feature = "p224",
+    feature = "p256",
+    feature = "p384"
+))]
+mod ecdsa;
+
+pub trait OidVerifier {
+    fn from_spki(key_info: SubjectPublicKeyInfoRef<'_>) -> Result<Self, Error>
+    where
+        Self: Sized;
+
+    fn verify(&self, msg: &[u8], signature: &X509Signature<'_>) -> Result<(), Error>;
+}
+
+pub struct X509Verifier {
+    inner: Box<dyn OidVerifier>,
+}
 
 impl X509Verifier {
     pub fn new(key_info: SubjectPublicKeyInfoRef<'_>) -> Result<Self, Error> {
-        Err(Error::Unknown(format!("{:?}", key_info.algorithm.oid)))
+        match &key_info.algorithm.oid {
+            #[cfg(feature = "dsa")]
+            &ID_DSA => Ok(Self {
+                inner: Box::from(self::dsa::X509DsaVerifier::try_from(key_info)?),
+            }),
+
+            #[cfg(feature = "rsa")]
+            &RSA_ENCRYPTION => Ok(Self {
+                inner: Box::from(self::rsa::X509RsaVerifier::try_from(key_info)?),
+            }),
+
+            #[cfg(any(
+                feature = "k256",
+                feature = "p192",
+                feature = "p224",
+                feature = "p256",
+                feature = "p384"
+            ))]
+            &ID_EC_PUBLIC_KEY => Ok(Self {
+                inner: Box::from(self::ecdsa::X509EcdsaVerifier::try_from(key_info)?),
+            }),
+
+            oid => Err(Error::UnknownOid(oid.clone())),
+        }
     }
 
     pub fn verify(&self, msg: &[u8], signature: &X509Signature<'_>) -> Result<(), Error> {
-        let digest = X509Digest::new(signature.oid())?.digest(msg);
-        Ok(())
+        self.inner.verify(msg, signature)
     }
 }
 
@@ -42,11 +100,11 @@ impl TryFrom<SubjectPublicKeyInfoOwned> for X509Verifier {
 #[cfg(test)]
 mod tests {
 
-    use crate::X509Verifier;
-    use der::{referenced::OwnedToRef, DecodePem};
+    use crate::{error::Error, X509Signature, X509Verifier};
+    use der::{DecodePem, Encode};
     use x509_cert::Certificate;
 
-    #[cfg(all(feature = "dsa", feature = "sha1"))]
+    #[allow(dead_code)]
     const PUBLIC_DSA_WITH_SHA1_PEM: &str = "-----BEGIN CERTIFICATE-----
 MIIC3zCCAo+gAwIBAgIUW5QcM75NT1tlmWNHto6ripqNLfQwCQYHKoZIzjgEAzAX
 MRUwEwYDVQQDDAxkc2ExMDI0LXNoYTEwHhcNMjMxMDIzMjM1NTU0WhcNMjYxMDIy
@@ -66,7 +124,7 @@ BAMDPwAwPAIcIpYMZ+03auXzGAJcxlErcDDjbSePciuEYvYKOQIcPk+qP0houutW
 X2U0Br/jMKcV2v1gQrmceaYw8g==
 -----END CERTIFICATE-----";
 
-    #[cfg(all(feature = "rsa", feature = "sha1"))]
+    #[allow(dead_code)]
     const PUBLIC_RSA_WITH_SHA1_PEM: &str = "-----BEGIN CERTIFICATE-----
 MIIDDzCCAfegAwIBAgIUDgYvXt2fxvm0dZ2mpo2dKso/N9kwDQYJKoZIhvcNAQEF
 BQAwFzEVMBMGA1UEAwwMcnNhMjA0OC1zaGExMB4XDTIzMTAyMzIzNTU1NFoXDTI2
@@ -87,7 +145,7 @@ bSrXO/OdtSEsvslext9w1vZlDM8X6tGc8rto/oxjBBNz3hz3aoi/pDztTuOFOpcV
 t6J21yhJIFoII5wpZnQnR/gNDw==
 -----END CERTIFICATE-----";
 
-    #[cfg(all(feature = "rsa", feature = "sha2"))]
+    #[allow(dead_code)]
     const PUBLIC_RSA_WITH_SHA256_PEM: &str = "-----BEGIN CERTIFICATE-----
 MIIDEzCCAfugAwIBAgIUV34hXTRkPVGDECxGfAtUxv0mGEgwDQYJKoZIhvcNAQEL
 BQAwGTEXMBUGA1UEAwwOcnNhMjA0OC1zaGEyNTYwHhcNMjMxMDIzMjM1NTU0WhcN
@@ -108,7 +166,7 @@ a78XBsuMSK19ruWu+0EPF28s7nym58cRRWGvfPSQlVwXPnW93DzEvSY/vYLZGoO3
 +dI7qJxzRjGT/2nqT2bnYmp21GQ8n0A=
 -----END CERTIFICATE-----";
 
-    #[cfg(all(feature = "k256", feature = "sha2"))]
+    #[allow(dead_code)]
     const PUBLIC_K256_WITH_SHA256_PEM: &str = "-----BEGIN CERTIFICATE-----
 MIIBhzCCAS6gAwIBAgIUNaJNxCBlhK0x+rh2fp+Fop3Zb2kwCgYIKoZIzj0EAwIw
 GzEZMBcGA1UEAwwQc2VjcDI1NmsxLXNoYTI1NjAeFw0yMzEwMjMyMzU1NTVaFw0y
@@ -121,7 +179,7 @@ r9sH4h1I/fV50o3U7PzqixRfw5Cgjrv4FwIgKQQ++WJQH741nKpacR24ASJKsqdA
 El6yNJKlH092eyw=
 -----END CERTIFICATE-----";
 
-    #[cfg(all(feature = "p192", feature = "sha2"))]
+    #[allow(dead_code)]
     const PUBLIC_P192_WITH_SHA224_PEM: &str = "-----BEGIN CERTIFICATE-----
 MIIBazCCASGgAwIBAgIUM6tSp2g4oihE5sVyf4acIlxERzQwCgYIKoZIzj0EAwEw
 GzEZMBcGA1UEAwwQc2VjcDE5MnIxLXNoYTIyNDAeFw0yMzEwMjMyMzU1NTVaFw0y
@@ -133,7 +191,7 @@ Af8EBTADAQH/MAoGCCqGSM49BAMBAzgAMDUCGHWW94/TwdL1QVzZFYDEW5/Lr7+T
 9gY9aAIZAOUgpD35Uku9ZUdDEstB1GUAS2d1FWfxnQ==
 -----END CERTIFICATE-----";
 
-    #[cfg(all(feature = "p224", feature = "sha2"))]
+    #[allow(dead_code)]
     const PUBLIC_P224_WITH_SHA224_PEM: &str = "-----BEGIN CERTIFICATE-----
 MIIBdzCCASagAwIBAgIUYEnzP6enrwE1YlhMzNm8377vF0UwCgYIKoZIzj0EAwEw
 GzEZMBcGA1UEAwwQc2VjcDIyNHIxLXNoYTIyNDAeFw0yMzEwMjMyMzU1NTVaFw0y
@@ -145,7 +203,7 @@ A1UdEwEB/wQFMAMBAf8wCgYIKoZIzj0EAwEDPwAwPAIcLXnXm1WLPqoVUzSOfeWe
 EG55AYKK0psHOspZ2wIcfhdo1Rdz9s9swl0mig5X5ebq0qZrKUeQC9Ye+w==
 -----END CERTIFICATE-----";
 
-    #[cfg(all(feature = "p256", feature = "sha2"))]
+    #[allow(dead_code)]
     const PUBLIC_P256_WITH_SHA256_PEM: &str = "-----BEGIN CERTIFICATE-----
 MIIBjDCCATOgAwIBAgIUD0hnV4dQTvEgNqY94vdYSdDtOaswCgYIKoZIzj0EAwIw
 HDEaMBgGA1UEAwwRcHJpbWUyNTZ2MS1zaGEyNTYwHhcNMjMxMDIzMjM1NTU0WhcN
@@ -158,7 +216,7 @@ Njtrr5nItA67cFOSvGM/Ctr1bvYifKZychENW6fmAiAe782xlc/68PLjUGfEECTS
 yY0RYLQ79tmNNk76SQ20GA==
 -----END CERTIFICATE-----";
 
-    #[cfg(all(feature = "p384", feature = "sha2"))]
+    #[allow(dead_code)]
     const PUBLIC_P384_WITH_SHA384_PEM: &str = "-----BEGIN CERTIFICATE-----
 MIIByDCCAU6gAwIBAgIUTseuBhvcGrLI5IRmmZVQdLkQJaYwCgYIKoZIzj0EAwMw
 GzEZMBcGA1UEAwwQc2VjcDM4NHIxLXNoYTM4NDAeFw0yMzEwMjMyMzU1NTVaFw0y
@@ -172,99 +230,262 @@ JQanPOuJxlQQTZgmy39RD3oT3Z1mcMY2b3wCMFxsSlFVZUhBkI6gCVlux+33iSFE
 ay4nBaFbWFxsrCIz5mjiyAkKm2dyPYzXKakLlA==
 -----END CERTIFICATE-----";
 
-    #[cfg(all(feature = "dsa", feature = "sha1"))]
-    #[test]
-    fn dsa_with_sha1_good() {
-        let cert =
-            Certificate::from_pem(&PUBLIC_DSA_WITH_SHA1_PEM).expect("error parsing certificate");
+    #[allow(dead_code)]
+    fn verify_good(pem: &str) {
+        let cert = Certificate::from_pem(pem).expect("error parsing certificate");
+        let msg = cert
+            .tbs_certificate
+            .to_der()
+            .expect("error encoding message");
+        let sig = X509Signature::new(
+            cert.signature_algorithm,
+            cert.signature
+                .as_bytes()
+                .expect("signature is not octet-aligned"),
+        );
         let verifier: X509Verifier = cert
             .tbs_certificate
             .subject_public_key_info
             .try_into()
             .expect("error making key");
+        verifier.verify(&msg, &sig).expect("error verifying");
+    }
+
+    #[allow(dead_code)]
+    fn verify_bad(pem: &str) {
+        let cert = Certificate::from_pem(pem).expect("error parsing certificate");
+        let msg = "Bad message";
+        let sig = X509Signature::new(
+            cert.signature_algorithm,
+            cert.signature
+                .as_bytes()
+                .expect("signature is not octet-aligned"),
+        );
+        let verifier: X509Verifier = cert
+            .tbs_certificate
+            .subject_public_key_info
+            .try_into()
+            .expect("error making key");
+        match verifier.verify(msg.as_bytes(), &sig) {
+            Ok(_) => panic!("should not have been good"),
+            Err(Error::Verification) => {}
+            Err(e) => panic!("{:?}", e),
+        }
+    }
+
+    #[allow(dead_code)]
+    fn verify_bad_oid(pem: &str) {
+        let cert = Certificate::from_pem(pem).expect("error parsing certificate");
+        let msg = cert
+            .tbs_certificate
+            .to_der()
+            .expect("error encoding message");
+        let sig = X509Signature::new(
+            cert.signature_algorithm,
+            cert.signature
+                .as_bytes()
+                .expect("signature is not octet-aligned"),
+        );
+        match X509Verifier::try_from(cert.tbs_certificate.subject_public_key_info) {
+            Ok(v) => match v.verify(&msg, &sig) {
+                Ok(_) => panic!("should not have been good"),
+                Err(Error::UnknownOid(_)) => {}
+                Err(e) => panic!("{:?}", e),
+            },
+            Err(Error::UnknownOid(_)) => {}
+            Err(e) => panic!("{:?}", e),
+        }
+    }
+
+    #[cfg(all(feature = "dsa", feature = "sha1"))]
+    #[test]
+    fn dsa_with_sha1_good() {
+        verify_good(&PUBLIC_DSA_WITH_SHA1_PEM);
+    }
+
+    #[cfg(all(feature = "dsa", feature = "sha1"))]
+    #[test]
+    fn dsa_with_sha1_bad() {
+        verify_bad(&PUBLIC_DSA_WITH_SHA1_PEM);
+    }
+
+    #[cfg(not(feature = "dsa"))]
+    #[test]
+    fn dsa_with_sha1_bad_oid1() {
+        verify_bad_oid(&PUBLIC_DSA_WITH_SHA1_PEM);
+    }
+
+    #[cfg(not(feature = "sha1"))]
+    #[test]
+    fn dsa_with_sha1_bad_oid2() {
+        verify_bad_oid(&PUBLIC_DSA_WITH_SHA1_PEM);
     }
 
     #[cfg(all(feature = "rsa", feature = "sha1"))]
     #[test]
     fn rsa_with_sha1_good() {
-        let cert =
-            Certificate::from_pem(&PUBLIC_RSA_WITH_SHA1_PEM).expect("error parsing certificate");
-        let verifier: X509Verifier = cert
-            .tbs_certificate
-            .subject_public_key_info
-            .try_into()
-            .expect("error making key");
+        verify_good(&PUBLIC_RSA_WITH_SHA1_PEM);
+    }
+
+    #[cfg(all(feature = "rsa", feature = "sha1"))]
+    #[test]
+    fn rsa_with_sha1_bad() {
+        verify_bad(&PUBLIC_RSA_WITH_SHA1_PEM);
+    }
+
+    #[cfg(not(feature = "rsa"))]
+    #[test]
+    fn rsa_with_sha1_bad_oid1() {
+        verify_bad_oid(&PUBLIC_RSA_WITH_SHA1_PEM);
+    }
+
+    #[cfg(not(feature = "sha1"))]
+    #[test]
+    fn rsa_with_sha1_bad_oid2() {
+        verify_bad_oid(&PUBLIC_RSA_WITH_SHA1_PEM);
     }
 
     #[cfg(all(feature = "rsa", feature = "sha2"))]
     #[test]
     fn rsa_with_sha256_good() {
-        let cert =
-            Certificate::from_pem(&PUBLIC_RSA_WITH_SHA256_PEM).expect("error parsing certificate");
-        let verifier: X509Verifier = cert
-            .tbs_certificate
-            .subject_public_key_info
-            .try_into()
-            .expect("error making key");
+        verify_good(&PUBLIC_RSA_WITH_SHA256_PEM);
+    }
+
+    #[cfg(all(feature = "rsa", feature = "sha2"))]
+    #[test]
+    fn rsa_with_sha256_bad() {
+        verify_bad(&PUBLIC_RSA_WITH_SHA256_PEM);
+    }
+
+    #[cfg(not(feature = "rsa"))]
+    #[test]
+    fn rsa_with_sha256_bad_oid1() {
+        verify_bad_oid(&PUBLIC_RSA_WITH_SHA256_PEM);
+    }
+
+    #[cfg(not(feature = "sha2"))]
+    #[test]
+    fn rsa_with_sha256_bad_oid2() {
+        verify_bad_oid(&PUBLIC_RSA_WITH_SHA256_PEM);
     }
 
     #[cfg(all(feature = "k256", feature = "sha2"))]
     #[test]
     fn k256_with_sha256_good() {
-        let cert =
-            Certificate::from_pem(&PUBLIC_K256_WITH_SHA256_PEM).expect("error parsing certificate");
-        let verifier: X509Verifier = cert
-            .tbs_certificate
-            .subject_public_key_info
-            .try_into()
-            .expect("error making key");
+        verify_good(&PUBLIC_K256_WITH_SHA256_PEM);
+    }
+
+    #[cfg(all(feature = "k256", feature = "sha2"))]
+    #[test]
+    fn k256_with_sha256_bad() {
+        verify_bad(&PUBLIC_K256_WITH_SHA256_PEM);
+    }
+
+    #[cfg(not(feature = "k256"))]
+    #[test]
+    fn k256_with_sha256_bad_oid1() {
+        verify_bad_oid(&PUBLIC_K256_WITH_SHA256_PEM);
+    }
+
+    #[cfg(not(feature = "sha2"))]
+    #[test]
+    fn k256_with_sha256_bad_oid2() {
+        verify_bad_oid(&PUBLIC_K256_WITH_SHA256_PEM);
     }
 
     #[cfg(all(feature = "p192", feature = "sha2"))]
     #[test]
     fn p192_with_sha224_good() {
-        let cert =
-            Certificate::from_pem(&PUBLIC_P192_WITH_SHA224_PEM).expect("error parsing certificate");
-        let verifier: X509Verifier = cert
-            .tbs_certificate
-            .subject_public_key_info
-            .try_into()
-            .expect("error making key");
+        verify_good(&PUBLIC_P192_WITH_SHA224_PEM);
+    }
+
+    #[cfg(all(feature = "p192", feature = "sha2"))]
+    #[test]
+    fn p192_with_sha224_bad() {
+        verify_bad(&PUBLIC_P192_WITH_SHA224_PEM);
+    }
+
+    #[cfg(not(feature = "p192"))]
+    #[test]
+    fn p192_with_sha224_bad_oid1() {
+        verify_bad_oid(&PUBLIC_P192_WITH_SHA224_PEM);
+    }
+
+    #[cfg(not(feature = "sha2"))]
+    #[test]
+    fn p192_with_sha224_bad_oid2() {
+        verify_bad_oid(&PUBLIC_P192_WITH_SHA224_PEM);
     }
 
     #[cfg(all(feature = "p224", feature = "sha2"))]
     #[test]
     fn p224_with_sha224_good() {
-        let cert =
-            Certificate::from_pem(&PUBLIC_P224_WITH_SHA224_PEM).expect("error parsing certificate");
-        let verifier: X509Verifier = cert
-            .tbs_certificate
-            .subject_public_key_info
-            .try_into()
-            .expect("error making key");
+        verify_good(&PUBLIC_P224_WITH_SHA224_PEM);
+    }
+
+    #[cfg(all(feature = "p224", feature = "sha2"))]
+    #[test]
+    fn p224_with_sha224_bad() {
+        verify_bad(&PUBLIC_P224_WITH_SHA224_PEM);
+    }
+
+    #[cfg(not(feature = "p224"))]
+    #[test]
+    fn p224_with_sha224_bad_oid1() {
+        verify_bad_oid(&PUBLIC_P224_WITH_SHA224_PEM);
+    }
+
+    #[cfg(not(feature = "sha2"))]
+    #[test]
+    fn p224_with_sha224_bad_oid2() {
+        verify_bad_oid(&PUBLIC_P224_WITH_SHA224_PEM);
     }
 
     #[cfg(all(feature = "p256", feature = "sha2"))]
     #[test]
     fn p256_with_sha256_good() {
-        let cert =
-            Certificate::from_pem(&PUBLIC_P256_WITH_SHA256_PEM).expect("error parsing certificate");
-        let verifier: X509Verifier = cert
-            .tbs_certificate
-            .subject_public_key_info
-            .try_into()
-            .expect("error making key");
+        verify_good(&PUBLIC_P256_WITH_SHA256_PEM);
+    }
+
+    #[cfg(all(feature = "p256", feature = "sha2"))]
+    #[test]
+    fn p256_with_sha256_bad() {
+        verify_bad(&PUBLIC_P256_WITH_SHA256_PEM);
+    }
+
+    #[cfg(not(feature = "p256"))]
+    #[test]
+    fn p256_with_sha256_bad_oid1() {
+        verify_bad_oid(&PUBLIC_P256_WITH_SHA256_PEM);
+    }
+
+    #[cfg(not(feature = "sha2"))]
+    #[test]
+    fn p256_with_sha256_bad_oid2() {
+        verify_bad_oid(&PUBLIC_P256_WITH_SHA256_PEM);
     }
 
     #[cfg(all(feature = "p384", feature = "sha2"))]
     #[test]
     fn p384_with_sha384_good() {
-        let cert =
-            Certificate::from_pem(&PUBLIC_P384_WITH_SHA384_PEM).expect("error parsing certificate");
-        let verifier: X509Verifier = cert
-            .tbs_certificate
-            .subject_public_key_info
-            .try_into()
-            .expect("error making key");
+        verify_good(&PUBLIC_P384_WITH_SHA384_PEM);
+    }
+
+    #[cfg(all(feature = "p384", feature = "sha2"))]
+    #[test]
+    fn p384_with_sha384_bad() {
+        verify_bad(&PUBLIC_P384_WITH_SHA384_PEM);
+    }
+
+    #[cfg(not(feature = "p384"))]
+    #[test]
+    fn p384_with_sha384_bad_oid1() {
+        verify_bad_oid(&PUBLIC_P384_WITH_SHA384_PEM);
+    }
+
+    #[cfg(not(feature = "sha2"))]
+    #[test]
+    fn p384_with_sha384_bad_oid2() {
+        verify_bad_oid(&PUBLIC_P384_WITH_SHA384_PEM);
     }
 }

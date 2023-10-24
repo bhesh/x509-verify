@@ -14,11 +14,8 @@ extern crate alloc;
 
 pub mod error;
 
-mod digest;
-pub use digest::X509Digest;
-
 mod signature;
 pub use signature::X509Signature;
 
 mod verify;
-pub use verify::X509Verifier;
+pub use verify::{OidVerifier, X509Verifier};
