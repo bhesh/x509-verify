@@ -37,10 +37,6 @@ use const_oid::db::rfc5912::ID_EC_PUBLIC_KEY;
 mod ecdsa;
 
 pub trait OidVerifier {
-    fn from_spki(key_info: SubjectPublicKeyInfoRef<'_>) -> Result<Self, Error>
-    where
-        Self: Sized;
-
     fn verify(&self, msg: &[u8], signature: &X509Signature<'_>) -> Result<(), Error>;
 }
 

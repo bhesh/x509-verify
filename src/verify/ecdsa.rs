@@ -157,10 +157,6 @@ impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509EcdsaVerifier {
 }
 
 impl OidVerifier for X509EcdsaVerifier {
-    fn from_spki(key_info: SubjectPublicKeyInfoRef<'_>) -> Result<Self, Error> {
-        key_info.try_into()
-    }
-
     fn verify(&self, msg: &[u8], signature: &X509Signature<'_>) -> Result<(), Error> {
         match signature.oid() {
             #[cfg(feature = "sha2")]
