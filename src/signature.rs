@@ -1,6 +1,5 @@
 //! Generic X.509 Signature
 
-use core::marker::PhantomData;
 use der::asn1::ObjectIdentifier;
 use spki::AlgorithmIdentifierOwned;
 

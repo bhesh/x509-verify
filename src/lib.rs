@@ -10,12 +10,15 @@
     unused_qualifications
 )]
 
-//extern crate alloc;
+extern crate alloc;
 
 pub mod error;
 
-mod verifier;
-pub use verifier::X509Verifier;
+mod digest;
+pub use digest::X509Digest;
 
 mod signature;
 pub use signature::X509Signature;
+
+mod verify;
+pub use verify::X509Verifier;

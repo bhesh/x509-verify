@@ -1,7 +1,9 @@
 //! Verification Errors
 
+use alloc::string::String;
 use der::asn1::ObjectIdentifier;
 
+#[derive(Clone, Debug)]
 pub enum Error {
     /// Verification Error
     Verification,
@@ -17,6 +19,9 @@ pub enum Error {
 
     /// Encoding Error
     Encoding,
+
+    /// Unknown
+    Unknown(String),
 }
 
 impl From<der::Error> for Error {
