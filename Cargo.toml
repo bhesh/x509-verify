@@ -9,7 +9,7 @@ Pure Rust library that verifies X.509 signatures based on the OIDs
 """
 
 [dependencies]
-const-oid = { version = "0.9.5", default-features = false, features = ["db"] }
+const-oid = { version = "0.9.5", default-features = false }
 der = { version = "0.7.8", default-features = false, features = ["derive", "oid"] }
 signature = { version = "2.1.0", default-features = false, features = ["digest"] }
 spki = { version = "0.7.2", default-features = false }

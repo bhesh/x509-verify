@@ -2,30 +2,16 @@
 
 use crate::{error::Error, X509Signature};
 use alloc::boxed::Box;
+use const_oid::AssociatedOid;
 use core::result::Result;
 use der::referenced::OwnedToRef;
 use spki::{SubjectPublicKeyInfoOwned, SubjectPublicKeyInfoRef};
 
 #[cfg(feature = "dsa")]
-use const_oid::db::rfc5912::ID_DSA;
-
-#[cfg(feature = "dsa")]
 mod dsa;
 
 #[cfg(feature = "rsa")]
-use const_oid::db::rfc5912::RSA_ENCRYPTION;
-
-#[cfg(feature = "rsa")]
 mod rsa;
-
-#[cfg(any(
-    feature = "k256",
-    feature = "p192",
-    feature = "p224",
-    feature = "p256",
-    feature = "p384"
-))]
-use const_oid::db::rfc5912::ID_EC_PUBLIC_KEY;
 
 #[cfg(any(
     feature = "k256",
@@ -48,12 +34,12 @@ impl X509Verifier {
     pub fn new(key_info: SubjectPublicKeyInfoRef<'_>) -> Result<Self, Error> {
         match &key_info.algorithm.oid {
             #[cfg(feature = "dsa")]
-            &ID_DSA => Ok(Self {
+            &self::dsa::X509DsaVerifier::OID => Ok(Self {
                 inner: Box::from(self::dsa::X509DsaVerifier::try_from(key_info)?),
             }),
 
             #[cfg(feature = "rsa")]
-            &RSA_ENCRYPTION => Ok(Self {
+            &self::rsa::X509RsaVerifier::OID => Ok(Self {
                 inner: Box::from(self::rsa::X509RsaVerifier::try_from(key_info)?),
             }),
 
@@ -64,7 +50,7 @@ impl X509Verifier {
                 feature = "p256",
                 feature = "p384"
             ))]
-            &ID_EC_PUBLIC_KEY => Ok(Self {
+            &self::ecdsa::X509EcdsaVerifier::OID => Ok(Self {
                 inner: Box::from(self::ecdsa::X509EcdsaVerifier::try_from(key_info)?),
             }),
 

@@ -1,6 +1,7 @@
 //! ECDSA Verifier
 
 use crate::{error::Error, OidVerifier, X509Signature};
+use const_oid::AssociatedOid;
 use der::asn1::ObjectIdentifier;
 use ecdsa::{Signature, VerifyingKey};
 use signature::{digest::Digest, hazmat::PrehashVerifier};
@@ -22,27 +23,34 @@ const SECP_192_R_1: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.100
 use p224;
 
 #[cfg(feature = "p224")]
-use const_oid::db::rfc5912::SECP_224_R_1;
+const SECP_224_R_1: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.3.132.0.33");
 
 #[cfg(feature = "p256")]
 use p256;
 
 #[cfg(feature = "p256")]
-use const_oid::db::rfc5912::SECP_256_R_1;
+const SECP_256_R_1: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.3.1.7");
 
 #[cfg(feature = "p384")]
 use p384;
 
 #[cfg(feature = "p384")]
-use const_oid::db::rfc5912::SECP_384_R_1;
+const SECP_384_R_1: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.3.132.0.34");
 
 #[cfg(feature = "sha2")]
 use sha2::{Sha224, Sha256, Sha384, Sha512};
 
 #[cfg(feature = "sha2")]
-use const_oid::db::rfc5912::{
-    ECDSA_WITH_SHA_224, ECDSA_WITH_SHA_256, ECDSA_WITH_SHA_384, ECDSA_WITH_SHA_512,
-};
+const ECDSA_WITH_SHA_224: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.4.3.1");
+
+#[cfg(feature = "sha2")]
+const ECDSA_WITH_SHA_256: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.4.3.2");
+
+#[cfg(feature = "sha2")]
+const ECDSA_WITH_SHA_384: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.4.3.3");
+
+#[cfg(feature = "sha2")]
+const ECDSA_WITH_SHA_512: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.4.3.4");
 
 pub enum X509EcdsaVerifier {
     #[cfg(feature = "k256")]
@@ -105,6 +113,10 @@ impl X509EcdsaVerifier {
             }
         }
     }
+}
+
+impl AssociatedOid for X509EcdsaVerifier {
+    const OID: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.2.1");
 }
 
 impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509EcdsaVerifier {

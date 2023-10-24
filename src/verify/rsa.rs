@@ -1,7 +1,8 @@
 //! RSA Verifier
 
 use crate::{error::Error, OidVerifier, X509Signature};
-use der::Encode;
+use const_oid::AssociatedOid;
+use der::{asn1::ObjectIdentifier, Encode};
 use rsa::{Pkcs1v15Sign, RsaPublicKey};
 use signature::digest::Digest;
 use spki::{DecodePublicKey, SubjectPublicKeyInfoRef};
@@ -10,31 +11,48 @@ use spki::{DecodePublicKey, SubjectPublicKeyInfoRef};
 use md2::Md2;
 
 #[cfg(feature = "md2")]
-use const_oid::db::rfc5912::MD_2_WITH_RSA_ENCRYPTION;
+const MD_2_WITH_RSA_ENCRYPTION: ObjectIdentifier =
+    ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.2");
 
 #[cfg(feature = "md5")]
 use md5::Md5;
 
 #[cfg(feature = "md5")]
-use const_oid::db::rfc5912::MD_5_WITH_RSA_ENCRYPTION;
+const MD_5_WITH_RSA_ENCRYPTION: ObjectIdentifier =
+    ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.4");
 
 #[cfg(feature = "sha1")]
 use sha1::Sha1;
 
 #[cfg(feature = "sha1")]
-use const_oid::db::rfc5912::SHA_1_WITH_RSA_ENCRYPTION;
+const SHA_1_WITH_RSA_ENCRYPTION: ObjectIdentifier =
+    ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.5");
 
 #[cfg(feature = "sha2")]
 use sha2::{Sha224, Sha256, Sha384, Sha512};
 
 #[cfg(feature = "sha2")]
-use const_oid::db::rfc5912::{
-    SHA_224_WITH_RSA_ENCRYPTION, SHA_256_WITH_RSA_ENCRYPTION, SHA_384_WITH_RSA_ENCRYPTION,
-    SHA_512_WITH_RSA_ENCRYPTION,
-};
+const SHA_224_WITH_RSA_ENCRYPTION: ObjectIdentifier =
+    ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.14");
+
+#[cfg(feature = "sha2")]
+const SHA_256_WITH_RSA_ENCRYPTION: ObjectIdentifier =
+    ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.11");
+
+#[cfg(feature = "sha2")]
+const SHA_384_WITH_RSA_ENCRYPTION: ObjectIdentifier =
+    ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.12");
+
+#[cfg(feature = "sha2")]
+const SHA_512_WITH_RSA_ENCRYPTION: ObjectIdentifier =
+    ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.13");
 
 pub struct X509RsaVerifier {
     key: RsaPublicKey,
+}
+
+impl AssociatedOid for X509RsaVerifier {
+    const OID: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.1");
 }
 
 impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509RsaVerifier {
