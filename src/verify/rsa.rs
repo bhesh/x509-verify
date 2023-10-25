@@ -1,6 +1,6 @@
 //! RSA Verifier
 
-use crate::{error::Error, OidVerifier, X509Signature};
+use crate::{error::Error, verify::OidVerifier, X509Signature};
 use const_oid::AssociatedOid;
 use der::{asn1::ObjectIdentifier, Encode};
 use rsa::{Pkcs1v15Sign, RsaPublicKey};

@@ -1,12 +1,17 @@
 [package]
 name = "x509-verify"
 version = "0.1.0"
-edition = "2021"
 description = """
-X.509 Verify
-
 Pure Rust library that verifies X.509 signatures based on the OIDs
 """
+authors = ["Brian Hession"]
+license = "Apache-2.0 OR MIT"
+repository = "https://github.com/bhesh/x509-verify/"
+categories = ["cryptography", "no-std"]
+keywords = ["crypto", "x509"]
+readme = "README.md"
+edition = "2021"
+rust-version = "1.73"
 
 [dependencies]
 const-oid = { version = "0.9.5", default-features = false }
@@ -27,7 +32,6 @@ p192 = { version = "0.13.0", optional = true, default-features = false, features
 p224 = { version = "0.13.2", optional = true, default-features = false, features = ["ecdsa"] }
 p256 = { version = "0.13.2", optional = true, default-features = false, features = ["ecdsa"] }
 p384 = { version = "0.13.0", optional = true, default-features = false, features = ["ecdsa"] }
-x509-cert = { version = "0.2.1", optional = true, default-features = false }
 
 [dev-dependencies]
 x509-cert = { version = "0.2.1", default-features = false, features = ["pem"] }
@@ -46,8 +50,7 @@ p192 = [ "sha2", "dep:ecdsa", "dep:p192" ]
 p224 = [ "sha2", "dep:ecdsa", "dep:p224" ]
 p256 = [ "sha2", "dep:ecdsa", "dep:p256" ]
 p384 = [ "sha2", "dep:ecdsa", "dep:p384" ]
-x509 = [ "dep:x509-cert" ]
-all = [ "md2", "md5", "sha1", "sha2", "dsa", "rsa", "ecc", "x509" ]
+all = [ "md2", "md5", "sha1", "sha2", "dsa", "rsa", "ecc" ]
 
 [package.metadata.docs.rs]
 all-features = true

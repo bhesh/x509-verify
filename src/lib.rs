@@ -18,4 +18,4 @@ mod signature;
 pub use signature::X509Signature;
 
 mod verify;
-pub use verify::{OidVerifier, X509Verifier};
+pub use verify::X509Verifier;

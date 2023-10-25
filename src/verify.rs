@@ -22,15 +22,18 @@ mod rsa;
 ))]
 mod ecdsa;
 
-pub trait OidVerifier {
+/// Trait used by [`X509Verifier`] internally
+pub(crate) trait OidVerifier {
     fn verify(&self, msg: &[u8], signature: &X509Signature<'_>) -> Result<(), Error>;
 }
 
+/// Structure used to verify a signature
 pub struct X509Verifier {
     inner: Box<dyn OidVerifier>,
 }
 
 impl X509Verifier {
+    /// Creates a new [`X509Verifier`] given the `SubjectPublicKeyInfo`
     pub fn new(key_info: SubjectPublicKeyInfoRef<'_>) -> Result<Self, Error> {
         match &key_info.algorithm.oid {
             #[cfg(feature = "dsa")]
@@ -58,6 +61,7 @@ impl X509Verifier {
         }
     }
 
+    /// Verifies the signature given the message and [`X509Signature`]
     pub fn verify(&self, msg: &[u8], signature: &X509Signature<'_>) -> Result<(), Error> {
         self.inner.verify(msg, signature)
     }
