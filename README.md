@@ -36,9 +36,7 @@ let verifier: X509Verifier = cert
 verifier.verify(&msg, &sig).expect("error verifying");
 ```
 
-## Verification
-
-Features
+## Optional features
 
 - default: sha2, rsa, k256, p256, p384
 - md2
