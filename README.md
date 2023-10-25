@@ -36,6 +36,25 @@ let verifier: X509Verifier = cert
 verifier.verify(&msg, &sig).expect("error verifying");
 ```
 
+## Verification
+
+Features
+
+- default: sha2, rsa, k256, p256, p384
+- md2
+- md5
+- sha1
+- sha2
+- dsa
+- rsa
+- ecc: k256, p192, p224, p256, p384
+- k256
+- p192
+- p224
+- p256
+- p384
+- all: md2, md5, sha1, sha2, dsa, rsa, ecc
+
 ## License
 
 Per [RustCrypto](https://github.com/RustCrypto/formats), licensed under:
