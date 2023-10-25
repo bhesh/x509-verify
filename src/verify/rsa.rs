@@ -52,6 +52,7 @@ pub struct X509RsaVerifier {
 }
 
 impl AssociatedOid for X509RsaVerifier {
+    // RSA_ENCRYPTION
     const OID: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.1");
 }
 

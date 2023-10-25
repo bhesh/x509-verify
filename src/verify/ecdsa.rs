@@ -116,6 +116,7 @@ impl X509EcdsaVerifier {
 }
 
 impl AssociatedOid for X509EcdsaVerifier {
+    // ID_EC_PUBLIC_KEY
     const OID: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.2.1");
 }
 

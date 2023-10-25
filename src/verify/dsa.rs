@@ -27,6 +27,7 @@ pub struct X509DsaVerifier {
 }
 
 impl AssociatedOid for X509DsaVerifier {
+    // ID_DSA
     const OID: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10040.4.1");
 }
 

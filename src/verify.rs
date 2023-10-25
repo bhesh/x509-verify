@@ -22,7 +22,7 @@ mod rsa;
 ))]
 mod ecdsa;
 
-pub trait OidVerifier: AssociatedOid {
+pub trait OidVerifier {
     fn verify(&self, msg: &[u8], signature: &X509Signature<'_>) -> Result<(), Error>;
 }
 
