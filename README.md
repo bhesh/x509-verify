@@ -1,8 +1,43 @@
 x509-verify
 ===========
 
-A pure rust implementation of X.509 verification. Makes use of [RustCrypto](https://github.com/RustCrypto/formats)
-library implementations of X.509 formats, DSA, RSA, and ECDSA.
+A pure rust implementation of X.509 verification. Makes use of [RustCrypto](https://github.com/RustCrypto)
+library implementations of [X.509 formats](https://github.com/RustCrypto/formats),
+[DSA](https://github.com/RustCrypto/signatures/tree/master/dsa), [RSA](https://github.com/RustCrypto/RSA),
+and [ECDSA](https://github.com/RustCrypto/signatures/tree/master/ecdsa).
+
+## Currently supported
+
+### DSA
+
+- `DSA_WITH_SHA_1`
+- `DSA_WITH_SHA_224`
+- `DSA_WITH_SHA_256`
+
+### RSA
+
+- `MD_2_WITH_RSA_ENCRYPTION` (feature: `md2`)
+- `MD_5_WITH_RSA_ENCRYPTION` (feature: `md5`)
+- `SHA_1_WITH_RSA_ENCRYPTION` (feature: `sha1`)
+- `SHA_224_WITH_RSA_ENCRYPTION`
+- `SHA_256_WITH_RSA_ENCRYPTION`
+- `SHA_384_WITH_RSA_ENCRYPTION`
+- `SHA_512_WITH_RSA_ENCRYPTION`
+
+### ECDSA
+
+- `ECDSA_WITH_SHA_224`
+- `ECDSA_WITH_SHA_256`
+- `ECDSA_WITH_SHA_384`
+- `ECDSA_WITH_SHA_512`
+
+### EC Curves
+
+- [k256](https://github.com/RustCrypto/elliptic-curves/tree/master/k256)
+- [p192](https://github.com/RustCrypto/elliptic-curves/tree/master/p192) (feature: `p192`)
+- [p224](https://github.com/RustCrypto/elliptic-curves/tree/master/p224) (feature: `p224`)
+- [p256](https://github.com/RustCrypto/elliptic-curves/tree/master/p256)
+- [p384](https://github.com/RustCrypto/elliptic-curves/tree/master/p384)
 
 ## Verification
 
