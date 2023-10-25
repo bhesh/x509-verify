@@ -8,7 +8,7 @@ and [ECDSA](https://github.com/RustCrypto/signatures/tree/master/ecdsa).
 
 ## Currently supported
 
-### [DSA](https://github.com/RustCrypto/signatures/tree/master/dsa)
+### DSA
 
 - `DSA_WITH_SHA_1` (features: `dsa`, `sha1`)
 - `DSA_WITH_SHA_224` (feature: `dsa`)
