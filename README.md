@@ -10,7 +10,7 @@ library implementations of X.509 formats, DSA, RSA, and ECDSA.
 use der::{DecodePem, Encode};
 use std::fs;
 use x509_cert::Certificate;
-use x509_verify::{error::Error, X509Signature, X509Verifier};
+use x509_verify::{X509Signature, X509Verifier};
 
 // Self-signed certificate
 let pem = fs::read_to_string("testdata/rsa2048-sha256-crt.pem").expect("error opening file");

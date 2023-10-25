@@ -1,6 +1,6 @@
 //! Generic X.509 Verifier
 
-use crate::{error::Error, X509Signature};
+use crate::{Error, X509Signature};
 use alloc::boxed::Box;
 use const_oid::AssociatedOid;
 use core::result::Result;
@@ -86,7 +86,7 @@ impl TryFrom<SubjectPublicKeyInfoOwned> for X509Verifier {
 #[cfg(test)]
 mod tests {
 
-    use crate::{error::Error, X509Signature, X509Verifier};
+    use crate::{Error, X509Signature, X509Verifier};
     use der::{DecodePem, Encode};
     use x509_cert::Certificate;
 

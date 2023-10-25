@@ -1,6 +1,6 @@
 //! ECDSA Verifier
 
-use crate::{error::Error, verify::OidVerifier, X509Signature};
+use crate::{verify::OidVerifier, Error, X509Signature};
 use const_oid::AssociatedOid;
 use der::asn1::ObjectIdentifier;
 use ecdsa::{Signature, VerifyingKey};

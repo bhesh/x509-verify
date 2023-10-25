@@ -12,7 +12,8 @@
 
 extern crate alloc;
 
-pub mod error;
+mod error;
+pub use error::Error;
 
 mod signature;
 pub use signature::X509Signature;
