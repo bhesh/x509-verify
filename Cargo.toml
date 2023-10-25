@@ -1,6 +1,6 @@
 [package]
 name = "x509-verify"
-version = "0.1.0"
+version = "0.1.1"
 description = """
 Pure Rust library that verifies X.509 signatures based on the OIDs
 """
