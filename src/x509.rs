@@ -1,6 +1,6 @@
 //! X.509 Verify Implementations
 
-use crate::{Error, X509Message, X509Signature, X509VerifyKey};
+use crate::{Error, X509MessageOwned, X509Signature, X509VerifyKey};
 use core::result::Result;
 use der::{referenced::OwnedToRef, Encode};
 use ocsp_x509::{BasicOcspResponse, OcspRequest};
@@ -8,19 +8,19 @@ use x509_cert::{crl::CertificateList, request::CertReq, Certificate};
 
 macro_rules! impl_as_message {
     ($from:ty, $where:ident) => {
-        impl TryFrom<&$from> for X509Message {
+        impl TryFrom<&$from> for X509MessageOwned {
             type Error = Error;
 
             fn try_from(obj: &$from) -> Result<Self, Self::Error> {
-                Ok(X509Message::new(obj.$where.to_der()?))
+                Ok(Self::from(obj.$where.to_der()?))
             }
         }
 
-        impl TryFrom<$from> for X509Message {
+        impl TryFrom<$from> for X509MessageOwned {
             type Error = Error;
 
             fn try_from(obj: $from) -> Result<Self, Self::Error> {
-                X509Message::try_from(&obj)
+                Self::try_from(&obj)
             }
         }
     };

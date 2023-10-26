@@ -4,6 +4,7 @@ use der::{asn1::ObjectIdentifier, referenced::OwnedToRef};
 use spki::{AlgorithmIdentifierOwned, AlgorithmIdentifierRef};
 
 /// Generic X.509 signature structure
+#[derive(Copy, Clone, Debug)]
 pub struct X509Signature<'a, 'b> {
     algorithm: AlgorithmIdentifierRef<'a>,
     data: &'b [u8],
@@ -31,6 +32,11 @@ impl<'a, 'b> X509Signature<'a, 'b> {
         self.algorithm.assert_algorithm_oid(expected_oid)
     }
 
+    /// Returns the AlgorithmIdentifier
+    pub fn algorithm(&self) -> AlgorithmIdentifierRef<'a> {
+        self.algorithm
+    }
+
     /// Returns a reference to the `ObjectIdentifier`
     pub fn oid(&self) -> &ObjectIdentifier {
         &self.algorithm.oid
@@ -39,5 +45,11 @@ impl<'a, 'b> X509Signature<'a, 'b> {
     /// Returns a reference to the raw signature data
     pub fn data(&self) -> &[u8] {
         self.data
+    }
+}
+
+impl<'a, 'b> From<&X509Signature<'a, 'b>> for X509Signature<'a, 'b> {
+    fn from(sig: &X509Signature<'a, 'b>) -> Self {
+        *sig
     }
 }

@@ -1,6 +1,6 @@
 //! ECDSA VerifyKey
 
-use crate::{verify::OidVerifyKey, Error, X509Message, X509Signature};
+use crate::{Error, X509Signature};
 use const_oid::AssociatedOid;
 use der::asn1::ObjectIdentifier;
 use ecdsa::{Signature, VerifyingKey};
@@ -8,31 +8,16 @@ use signature::{digest::Digest, hazmat::PrehashVerifier};
 use spki::SubjectPublicKeyInfoRef;
 
 #[cfg(feature = "k256")]
-use k256;
-
-#[cfg(feature = "k256")]
 const SECP_256_K_1: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.3.132.0.10");
-
-#[cfg(feature = "p192")]
-use p192;
 
 #[cfg(feature = "p192")]
 const SECP_192_R_1: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.3.1.1");
 
 #[cfg(feature = "p224")]
-use p224;
-
-#[cfg(feature = "p224")]
 const SECP_224_R_1: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.3.132.0.33");
 
 #[cfg(feature = "p256")]
-use p256;
-
-#[cfg(feature = "p256")]
 const SECP_256_R_1: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.3.1.7");
-
-#[cfg(feature = "p384")]
-use p384;
 
 #[cfg(feature = "p384")]
 const SECP_384_R_1: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.3.132.0.34");
@@ -52,6 +37,7 @@ const ECDSA_WITH_SHA_384: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.8
 #[cfg(feature = "sha2")]
 const ECDSA_WITH_SHA_512: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.4.3.4");
 
+#[derive(Clone, Debug)]
 pub enum X509EcdsaVerifyKey {
     #[cfg(feature = "k256")]
     K256(VerifyingKey<k256::Secp256k1>),
@@ -168,13 +154,13 @@ impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509EcdsaVerifyKey {
                     .or(Err(Error::InvalidKey))?,
             )),
 
-            _ => Err(Error::UnknownOid(oid.clone())),
+            oid => Err(Error::UnknownOid(*oid)),
         }
     }
 }
 
-impl OidVerifyKey for X509EcdsaVerifyKey {
-    fn verify(&self, msg: &X509Message, signature: &X509Signature<'_, '_>) -> Result<(), Error> {
+impl X509EcdsaVerifyKey {
+    pub fn verify(&self, msg: &[u8], signature: &X509Signature<'_, '_>) -> Result<(), Error> {
         match signature.oid() {
             #[cfg(feature = "sha2")]
             &ECDSA_WITH_SHA_224 => self.verify_prehash(&Sha224::digest(msg), signature),
@@ -188,7 +174,7 @@ impl OidVerifyKey for X509EcdsaVerifyKey {
             #[cfg(feature = "sha2")]
             &ECDSA_WITH_SHA_512 => self.verify_prehash(&Sha512::digest(msg), signature),
 
-            oid => Err(Error::UnknownOid(oid.clone())),
+            oid => Err(Error::UnknownOid(*oid)),
         }
     }
 }

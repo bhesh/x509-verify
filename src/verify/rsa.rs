@@ -1,6 +1,6 @@
 //! RSA VerifyKey
 
-use crate::{verify::OidVerifyKey, Error, X509Message, X509Signature};
+use crate::{Error, X509Signature};
 use const_oid::AssociatedOid;
 use der::{asn1::ObjectIdentifier, Encode};
 use rsa::{Pkcs1v15Sign, RsaPublicKey};
@@ -47,6 +47,7 @@ const SHA_384_WITH_RSA_ENCRYPTION: ObjectIdentifier =
 const SHA_512_WITH_RSA_ENCRYPTION: ObjectIdentifier =
     ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.13");
 
+#[derive(Clone, Debug)]
 pub struct X509RsaVerifyKey {
     key: RsaPublicKey,
 }
@@ -66,15 +67,15 @@ impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509RsaVerifyKey {
     }
 }
 
-impl OidVerifyKey for X509RsaVerifyKey {
-    fn verify(&self, msg: &X509Message, signature: &X509Signature<'_, '_>) -> Result<(), Error> {
+impl X509RsaVerifyKey {
+    pub fn verify(&self, msg: &[u8], signature: &X509Signature<'_, '_>) -> Result<(), Error> {
         match signature.oid() {
             #[cfg(feature = "md2")]
             &MD_2_WITH_RSA_ENCRYPTION => self
                 .key
                 .verify(
                     Pkcs1v15Sign::new::<Md2>(),
-                    &Md2::digest(&msg),
+                    &Md2::digest(msg),
                     signature.data(),
                 )
                 .or(Err(Error::Verification)),
@@ -84,7 +85,7 @@ impl OidVerifyKey for X509RsaVerifyKey {
                 .key
                 .verify(
                     Pkcs1v15Sign::new::<Md5>(),
-                    &Md5::digest(&msg),
+                    &Md5::digest(msg),
                     signature.data(),
                 )
                 .or(Err(Error::Verification)),
@@ -94,7 +95,7 @@ impl OidVerifyKey for X509RsaVerifyKey {
                 .key
                 .verify(
                     Pkcs1v15Sign::new::<Sha1>(),
-                    &Sha1::digest(&msg),
+                    &Sha1::digest(msg),
                     signature.data(),
                 )
                 .or(Err(Error::Verification)),
@@ -104,7 +105,7 @@ impl OidVerifyKey for X509RsaVerifyKey {
                 .key
                 .verify(
                     Pkcs1v15Sign::new::<Sha224>(),
-                    &Sha224::digest(&msg),
+                    &Sha224::digest(msg),
                     signature.data(),
                 )
                 .or(Err(Error::Verification)),
@@ -114,7 +115,7 @@ impl OidVerifyKey for X509RsaVerifyKey {
                 .key
                 .verify(
                     Pkcs1v15Sign::new::<Sha256>(),
-                    &Sha256::digest(&msg),
+                    &Sha256::digest(msg),
                     signature.data(),
                 )
                 .or(Err(Error::Verification)),
@@ -124,7 +125,7 @@ impl OidVerifyKey for X509RsaVerifyKey {
                 .key
                 .verify(
                     Pkcs1v15Sign::new::<Sha384>(),
-                    &Sha384::digest(&msg),
+                    &Sha384::digest(msg),
                     signature.data(),
                 )
                 .or(Err(Error::Verification)),
@@ -134,12 +135,12 @@ impl OidVerifyKey for X509RsaVerifyKey {
                 .key
                 .verify(
                     Pkcs1v15Sign::new::<Sha512>(),
-                    &Sha512::digest(&msg),
+                    &Sha512::digest(msg),
                     signature.data(),
                 )
                 .or(Err(Error::Verification)),
 
-            oid => Err(Error::UnknownOid(oid.clone())),
+            oid => Err(Error::UnknownOid(*oid)),
         }
     }
 }

@@ -16,7 +16,7 @@ mod error;
 pub use error::Error;
 
 mod message;
-pub use message::X509Message;
+pub use message::{X509Message, X509MessageOwned, X509MessageRef};
 
 mod signature;
 pub use signature::X509Signature;
