@@ -1,17 +1,25 @@
 //! Generic X.509 Signature
 
-use der::asn1::ObjectIdentifier;
-use spki::AlgorithmIdentifierOwned;
+use der::{asn1::ObjectIdentifier, referenced::OwnedToRef};
+use spki::{AlgorithmIdentifierOwned, AlgorithmIdentifierRef};
 
 /// Generic X.509 signature structure
-pub struct X509Signature<'a> {
-    algorithm: AlgorithmIdentifierOwned,
-    data: &'a [u8],
+pub struct X509Signature<'a, 'b> {
+    algorithm: AlgorithmIdentifierRef<'a>,
+    data: &'b [u8],
 }
 
-impl<'a> X509Signature<'a> {
+impl<'a, 'b> X509Signature<'a, 'b> {
     /// Builds a new signature object given the `AlgorithmIdentifier` and the signature data
-    pub fn new(algorithm: AlgorithmIdentifierOwned, data: &'a [u8]) -> Self {
+    pub fn new(algorithm: &'a AlgorithmIdentifierOwned, data: &'b [u8]) -> Self {
+        Self {
+            algorithm: algorithm.owned_to_ref(),
+            data,
+        }
+    }
+
+    /// Builds a new signature object given the `AlgorithmIdentifier` and the signature data
+    pub fn from_ref(algorithm: AlgorithmIdentifierRef<'a>, data: &'b [u8]) -> Self {
         Self { algorithm, data }
     }
 

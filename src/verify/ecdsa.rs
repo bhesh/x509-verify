@@ -1,6 +1,6 @@
-//! ECDSA Verifier
+//! ECDSA VerifyKey
 
-use crate::{verify::OidVerifier, Error, X509Signature};
+use crate::{verify::OidVerifyKey, Error, X509Message, X509Signature};
 use const_oid::AssociatedOid;
 use der::asn1::ObjectIdentifier;
 use ecdsa::{Signature, VerifyingKey};
@@ -52,7 +52,7 @@ const ECDSA_WITH_SHA_384: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.8
 #[cfg(feature = "sha2")]
 const ECDSA_WITH_SHA_512: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.4.3.4");
 
-pub enum X509EcdsaVerifier {
+pub enum X509EcdsaVerifyKey {
     #[cfg(feature = "k256")]
     K256(VerifyingKey<k256::Secp256k1>),
 
@@ -69,8 +69,12 @@ pub enum X509EcdsaVerifier {
     P384(VerifyingKey<p384::NistP384>),
 }
 
-impl X509EcdsaVerifier {
-    fn verify_prehash(&self, prehash: &[u8], signature: &X509Signature<'_>) -> Result<(), Error> {
+impl X509EcdsaVerifyKey {
+    fn verify_prehash(
+        &self,
+        prehash: &[u8],
+        signature: &X509Signature<'_, '_>,
+    ) -> Result<(), Error> {
         match &self {
             #[cfg(feature = "k256")]
             Self::K256(pk) => {
@@ -115,12 +119,12 @@ impl X509EcdsaVerifier {
     }
 }
 
-impl AssociatedOid for X509EcdsaVerifier {
+impl AssociatedOid for X509EcdsaVerifyKey {
     // ID_EC_PUBLIC_KEY
     const OID: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.2.1");
 }
 
-impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509EcdsaVerifier {
+impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509EcdsaVerifyKey {
     type Error = Error;
 
     fn try_from(other: SubjectPublicKeyInfoRef<'_>) -> Result<Self, Self::Error> {
@@ -169,8 +173,8 @@ impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509EcdsaVerifier {
     }
 }
 
-impl OidVerifier for X509EcdsaVerifier {
-    fn verify(&self, msg: &[u8], signature: &X509Signature<'_>) -> Result<(), Error> {
+impl OidVerifyKey for X509EcdsaVerifyKey {
+    fn verify(&self, msg: &X509Message, signature: &X509Signature<'_, '_>) -> Result<(), Error> {
         match signature.oid() {
             #[cfg(feature = "sha2")]
             &ECDSA_WITH_SHA_224 => self.verify_prehash(&Sha224::digest(msg), signature),

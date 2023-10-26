@@ -15,8 +15,14 @@ extern crate alloc;
 mod error;
 pub use error::Error;
 
+mod message;
+pub use message::X509Message;
+
 mod signature;
 pub use signature::X509Signature;
 
 mod verify;
-pub use verify::X509Verifier;
+pub use verify::X509VerifyKey;
+
+#[cfg(feature = "x509")]
+mod x509;

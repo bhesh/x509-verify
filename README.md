@@ -45,30 +45,48 @@ and [ECDSA](https://github.com/RustCrypto/signatures/tree/master/ecdsa).
 use der::{DecodePem, Encode};
 use std::fs;
 use x509_cert::Certificate;
-use x509_verify::{X509Signature, X509Verifier};
+use x509_verify::{X509Message, X509Signature, X509VerifyKey};
 
 // Self-signed certificate
 let pem = fs::read_to_string("testdata/rsa2048-sha256-crt.pem").expect("error opening file");
 let cert = Certificate::from_pem(&pem).expect("error formatting signing cert");
 
-let msg = cert
-    .tbs_certificate
-    .to_der()
-    .expect("error encoding message");
+let msg = X509Message::new(
+    cert.tbs_certificate
+        .to_der()
+        .expect("error encoding message"),
+);
 let sig = X509Signature::new(
-    cert.signature_algorithm,
+    &cert.signature_algorithm,
     cert.signature
         .as_bytes()
         .expect("signature is not octet-aligned"),
 );
 
-let verifier: X509Verifier = cert
+let key: X509VerifyKey = cert
     .tbs_certificate
     .subject_public_key_info
     .try_into()
     .expect("error making key");
 
-verifier.verify(&msg, &sig).expect("error verifying");
+key.verify(&msg, &sig).expect("error verifying");
+```
+
+## x509 feature
+
+```rust
+use der::{DecodePem, Encode};
+use std::fs;
+use x509_cert::Certificate;
+use x509_verify::{X509Message, X509Signature, X509VerifyKey};
+
+// Self-signed certificate
+let pem = fs::read_to_string("testdata/rsa2048-sha256-crt.pem").expect("error opening file");
+let cert = Certificate::from_pem(&pem).expect("error formatting signing cert");
+
+let key: X509VerifyKey = (&cert).try_into().expect("error making key");
+
+key.x509_verify(&cert, &cert).expect("error verifying");
 ```
 
 ## Optional features

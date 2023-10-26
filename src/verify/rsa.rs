@@ -1,6 +1,6 @@
-//! RSA Verifier
+//! RSA VerifyKey
 
-use crate::{verify::OidVerifier, Error, X509Signature};
+use crate::{verify::OidVerifyKey, Error, X509Message, X509Signature};
 use const_oid::AssociatedOid;
 use der::{asn1::ObjectIdentifier, Encode};
 use rsa::{Pkcs1v15Sign, RsaPublicKey};
@@ -47,16 +47,16 @@ const SHA_384_WITH_RSA_ENCRYPTION: ObjectIdentifier =
 const SHA_512_WITH_RSA_ENCRYPTION: ObjectIdentifier =
     ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.13");
 
-pub struct X509RsaVerifier {
+pub struct X509RsaVerifyKey {
     key: RsaPublicKey,
 }
 
-impl AssociatedOid for X509RsaVerifier {
+impl AssociatedOid for X509RsaVerifyKey {
     // RSA_ENCRYPTION
     const OID: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.1");
 }
 
-impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509RsaVerifier {
+impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509RsaVerifyKey {
     type Error = Error;
 
     fn try_from(other: SubjectPublicKeyInfoRef<'_>) -> Result<Self, Self::Error> {
@@ -66,8 +66,8 @@ impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509RsaVerifier {
     }
 }
 
-impl OidVerifier for X509RsaVerifier {
-    fn verify(&self, msg: &[u8], signature: &X509Signature<'_>) -> Result<(), Error> {
+impl OidVerifyKey for X509RsaVerifyKey {
+    fn verify(&self, msg: &X509Message, signature: &X509Signature<'_, '_>) -> Result<(), Error> {
         match signature.oid() {
             #[cfg(feature = "md2")]
             &MD_2_WITH_RSA_ENCRYPTION => self
