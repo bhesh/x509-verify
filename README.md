@@ -1,10 +1,26 @@
 x509-verify
 ===========
 
-A pure Rust implementation of X.509 verification. Makes use of [RustCrypto](https://github.com/RustCrypto)
-library implementations of [X.509 formats](https://github.com/RustCrypto/formats),
-[DSA](https://github.com/RustCrypto/signatures/tree/master/dsa), [RSA](https://github.com/RustCrypto/RSA),
-and [ECDSA](https://github.com/RustCrypto/signatures/tree/master/ecdsa).
+A pure Rust, no standard library, implementation of X.509 verification. Makes use of
+[RustCrypto](https://github.com/RustCrypto) implementations of
+[X.509 formats](https://github.com/RustCrypto/formats),
+[DSA](https://github.com/RustCrypto/signatures/tree/master/dsa),
+[RSA](https://github.com/RustCrypto/RSA), and
+[ECDSA](https://github.com/RustCrypto/signatures/tree/master/ecdsa).
+
+The goal of this crate is to provide a general means of verification for all common X.509 algorithm identifiers.
+It aims to abstract away some of the verification nuances of signatures within X.509 objects. Such as:
+
+- Extracting the public key of a certificate and mapping it to the appropriate `signature::VerifyingKey`
+- Extracting the raw message of the signature and running it through the appropriate `digest::Digest` algorithm
+- Extracting the signature bytes and structuring them into the expected format required of the identified algorithm
+
+This crate relies heavily on external implementations of the underlying algorithms. These algorithms will all be
+included as optional features so the user can pick and choose whatever is relevant to their use-case.
+
+## Security Warning
+
+Some of the features of this crate are in an early, experimental phase. Use at your own risk.
 
 ## Currently supported
 
@@ -75,7 +91,7 @@ and [ECDSA](https://github.com/RustCrypto/signatures/tree/master/ecdsa).
 ## x509 feature
 
 ```rust
-#[cfg(all(feature = "rsa", feature = "sha2", feature = "x509"))]
+#[cfg(all(feature = "rsa", feature = "sha2", feature = "x509", feature = "pem"))]
 {
     use der::{Decode, DecodePem, Encode};
     use std::{io::Read, fs};
@@ -131,21 +147,34 @@ and [ECDSA](https://github.com/RustCrypto/signatures/tree/master/ecdsa).
 
 ## Optional features
 
-- default: sha2, rsa, k256, p256, p384
-- md2
-- md5
-- sha1
-- sha2
-- dsa
-- rsa
-- ecc: k256, p192, p224, p256, p384
-- k256
-- p192
-- p224
-- p256
-- p384
-- x509
-- all: md2, md5, sha1, sha2, dsa, rsa, ecc, x509
+### Digests
+
+Enables specific digest algorithms.
+
+ - md2
+ - md5
+ - sha1
+ - sha2 (default)
+
+### Key/signature types
+
+Enables specific key and signature algorithms.
+
+ - dsa
+ - rsa (default)
+ - k256 (default)
+ - p192
+ - p224
+ - p256 (default)
+ - p384 (default)
+ - ecc (includes all EC types listed above)
+
+### X.509
+
+Enables X.509 object conversion into key/message/signature objects.
+
+ - x509
+ - pem (requires x509 and adds the `DecodePem` trait to reimports)
 
 ## License
 
