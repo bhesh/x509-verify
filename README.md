@@ -1,15 +1,15 @@
 x509-verify
 ===========
 
-A pure Rust, no standard library, implementation of X.509 verification. Makes use of
+A pure Rust, no standard library implementation of X.509 verification. Makes use of
 [RustCrypto](https://github.com/RustCrypto) implementations of
 [X.509 formats](https://github.com/RustCrypto/formats),
 [DSA](https://github.com/RustCrypto/signatures/tree/master/dsa),
 [RSA](https://github.com/RustCrypto/RSA), and
 [ECDSA](https://github.com/RustCrypto/signatures/tree/master/ecdsa).
 
-The goal of this crate is to provide a general means of verification for all common X.509 algorithm identifiers.
-It aims to abstract away some of the verification nuances of signatures within X.509 objects. Such as:
+The goal of this crate is to provide a general means of verification for common X.509 algorithm identifiers.
+It aims to abstract away some of the verification nuances of signatures within X.509 structures. Such as:
 
 - Extracting the public key of a certificate and mapping it to the appropriate `signature::VerifyingKey`
 - Extracting the raw message of the signature and running it through the appropriate `digest::Digest` algorithm
@@ -171,7 +171,7 @@ Enables specific key and signature algorithms.
 
 ### X.509
 
-Enables X.509 object conversion into key/message/signature objects.
+Enables X.509 object conversion into key/message/signature structures.
 
  - x509
  - pem (requires x509 and adds the `DecodePem` trait to reimports)
