@@ -1,6 +1,6 @@
 [package]
 name = "x509-verify"
-version = "0.2.1"
+version = "0.2.2"
 description = """
 Pure Rust library that verifies X.509 signatures based on the OIDs
 """
@@ -36,7 +36,7 @@ x509-cert = { version = "0.2.4", optional = true, default-features = false }
 ocsp-x509 = { version = "0.1.1", optional = true, default-features = false }
 
 [dev-dependencies]
-#x509-cert = { version = "0.2.4", default-features = false, features = ["pem"] }
+x509-cert = { version = "0.2.4", default-features = false, features = ["pem"] }
 
 [features]
 default = [ "sha2", "rsa", "k256", "p256", "p384" ]
