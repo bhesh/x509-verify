@@ -26,3 +26,9 @@ pub use verify::X509VerifyKey;
 
 #[cfg(feature = "x509")]
 mod x509;
+
+#[cfg(feature = "x509")]
+pub use ocsp_x509 as x509_ocsp;
+
+#[cfg(feature = "x509")]
+pub use x509_cert;

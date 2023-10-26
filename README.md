@@ -1,7 +1,7 @@
 x509-verify
 ===========
 
-A pure rust implementation of X.509 verification. Makes use of [RustCrypto](https://github.com/RustCrypto)
+A pure Rust implementation of X.509 verification. Makes use of [RustCrypto](https://github.com/RustCrypto)
 library implementations of [X.509 formats](https://github.com/RustCrypto/formats),
 [DSA](https://github.com/RustCrypto/signatures/tree/master/dsa), [RSA](https://github.com/RustCrypto/RSA),
 and [ECDSA](https://github.com/RustCrypto/signatures/tree/master/ecdsa).
@@ -42,27 +42,27 @@ and [ECDSA](https://github.com/RustCrypto/signatures/tree/master/ecdsa).
 ## Verification
 
 ```rust
-use der::{DecodePem, Encode};
-use std::fs;
-use x509_cert::Certificate;
-use x509_verify::{X509Message, X509Signature, X509VerifyKey};
-
-// Self-signed certificate
-let pem = fs::read_to_string("testdata/rsa2048-sha256-crt.pem").expect("error opening file");
-let cert = Certificate::from_pem(&pem).expect("error formatting signing cert");
-
-let msg = cert.tbs_certificate
-    .to_der()
-    .expect("error encoding message");
-let sig = X509Signature::new(
-    &cert.signature_algorithm,
-    cert.signature
-        .as_bytes()
-        .expect("signature is not octet-aligned"),
-);
-
 #[cfg(all(feature = "rsa", feature = "sha2"))]
 {
+    use der::{DecodePem, Encode};
+    use std::fs;
+    use x509_cert::Certificate;
+    use x509_verify::{X509Message, X509Signature, X509VerifyKey};
+
+    // Self-signed certificate
+    let pem = fs::read_to_string("testdata/rsa2048-sha256-crt.pem").expect("error reading file");
+    let cert = Certificate::from_pem(&pem).expect("error formatting signing cert");
+
+    let msg = cert.tbs_certificate
+        .to_der()
+        .expect("error encoding message");
+    let sig = X509Signature::new(
+        &cert.signature_algorithm,
+        cert.signature
+            .as_bytes()
+            .expect("signature is not octet-aligned"),
+    );
+
     let key: X509VerifyKey = cert
         .tbs_certificate
         .subject_public_key_info
@@ -75,19 +75,57 @@ let sig = X509Signature::new(
 ## x509 feature
 
 ```rust
-use der::{DecodePem, Encode};
-use std::fs;
-use x509_cert::Certificate;
-use x509_verify::{X509Message, X509Signature, X509VerifyKey};
-
-// Self-signed certificate
-let pem = fs::read_to_string("testdata/rsa2048-sha256-crt.pem").expect("error opening file");
-let cert = Certificate::from_pem(&pem).expect("error formatting signing cert");
-
 #[cfg(all(feature = "rsa", feature = "sha2", feature = "x509"))]
 {
-    let key = X509VerifyKey::try_from(&cert).expect("error making key");
+    use der::{Decode, DecodePem, Encode};
+    use std::{io::Read, fs};
+    use x509_verify::{
+        x509_cert::{crl::CertificateList, Certificate},
+        x509_ocsp::{BasicOcspResponse, OcspResponse, OcspResponseStatus},
+        X509Message, X509Signature, X509VerifyKey,
+    };
+
+    // CA-signed certificate
+    let pem = fs::read_to_string("testdata/digicert-ca.pem").expect("error reading file");
+    let ca = Certificate::from_pem(&pem).expect("error decoding signing cert");
+    let pem = fs::read_to_string("testdata/amazon-crt.pem").expect("error reading file");
+    let cert = Certificate::from_pem(&pem).expect("error decoding signing cert");
+
+    // Verify
+    let key = X509VerifyKey::try_from(&ca).expect("error making key");
     key.verify(&cert, &cert).expect("error verifying");
+
+    // CA-signed CRL
+    let mut f = fs::File::open("testdata/GoodCACRL.crl").expect("error opening file");
+    let mut data = Vec::new();
+    f.read_to_end(&mut data).expect("error reading file");
+    let crl = CertificateList::from_der(&data).expect("error decoding CRL");
+    let pem = fs::read_to_string("testdata/GoodCACert.pem").expect("error reading file");
+    let ca = Certificate::from_pem(&pem).expect("error decoding signing cert");
+
+    // Verify
+    let key = X509VerifyKey::try_from(&ca).expect("error making key");
+    key.verify(&crl, &crl).expect("error verifying");
+
+    // CA-signed OCSP response
+    let mut f = fs::File::open("testdata/ocsp-amazon-resp.der").expect("error opening file");
+    let mut data = Vec::new();
+    f.read_to_end(&mut data).expect("error reading file");
+    let res = OcspResponse::from_der(&data).expect("error decoding OcspRequest");
+    assert_eq!(res.response_status, OcspResponseStatus::Successful);
+    let res = BasicOcspResponse::from_der(
+        res.response_bytes
+            .expect("no response data")
+            .response
+            .as_bytes(),
+    )
+    .expect("error decoding BasicOcspResponse");
+    let pem = fs::read_to_string("testdata/digicert-ca.pem").expect("error reading file");
+    let ca = Certificate::from_pem(&pem).expect("error decoding signing cert");
+
+    // Verify
+    let key = X509VerifyKey::try_from(&ca).expect("error making key");
+    key.verify(&res, &res).expect("error verifying");
 }
 ```
 
