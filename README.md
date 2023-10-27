@@ -169,7 +169,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 | ecdsa | | k256, p192, p224, p256, and p384 |
 | ed25519 | | Ed25519 signatures |
 | x509 | | enables X.509 structure conversion |
-| pem | | requires x509 and adds the `DecodePem` trait to reimports |
+| pem | | adds the `DecodePem` trait to X.509 reimports |
 
 ## License
 
