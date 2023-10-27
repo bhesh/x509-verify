@@ -28,19 +28,19 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 
 ### DSA
 
-- `DSA_WITH_SHA_1` (features: `dsa`, `sha1`)
-- `DSA_WITH_SHA_224` (feature: `dsa`)
-- `DSA_WITH_SHA_256` (feature: `dsa`)
+- `DSA_WITH_SHA_1`
+- `DSA_WITH_SHA_224`
+- `DSA_WITH_SHA_256`
 
 ### EdDSA
 
-- `ED25519` (feature: `ed25519`)
+- `ED25519`
 
 ### RSA
 
-- `MD_2_WITH_RSA_ENCRYPTION` (feature: `md2`)
-- `MD_5_WITH_RSA_ENCRYPTION` (feature: `md5`)
-- `SHA_1_WITH_RSA_ENCRYPTION` (feature: `sha1`)
+- `MD_2_WITH_RSA_ENCRYPTION`
+- `MD_5_WITH_RSA_ENCRYPTION`
+- `SHA_1_WITH_RSA_ENCRYPTION`
 - `SHA_224_WITH_RSA_ENCRYPTION`
 - `SHA_256_WITH_RSA_ENCRYPTION`
 - `SHA_384_WITH_RSA_ENCRYPTION`
