@@ -158,16 +158,16 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 | md2 | | MD-2 digests |
 | md5 | | MD-5 digests |
 | sha1 | | SHA-1 digests |
-| sha2 | :white_check_mark: | SHA-2 digests |
+| sha2 | ✔️ | SHA-2 digests |
 | dsa | | DSA signatures |
-| rsa | :white_check_mark: | RSA signatures |
-| k256 | :white_check_mark: | secp256k1 ECDSA signatures |
+| rsa | ✔️ | RSA signatures |
+| k256 | ✔️ | secp256k1 ECDSA signatures |
 | p192 | | secp192r1 ECDSA signatures |
 | p224 | | secp224r1 ECDSA signatures |
-| p256 | :white_check_mark: | secp256r1 ECDSA signatures |
-| p384 | :white_check_mark: | secp284r1 ECDSA signatures |
+| p256 | ✔️ | secp256r1 ECDSA signatures |
+| p384 | ✔️ | secp284r1 ECDSA signatures |
 | ecdsa | | k256, p192, p224, p256, and p384 |
-| ed25519 | :white_check_mark: | Ed25519 signatures |
+| ed25519 | ✔️ | Ed25519 signatures |
 | x509 | | enables X.509 structure conversion |
 | pem | | adds the `DecodePem` trait to X.509 reimports |
 
