@@ -160,19 +160,19 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 | md2 | | MD-2 digests |
 | md5 | | MD-5 digests |
 | sha1 | | SHA-1 digests |
-| sha2 | :heavy_check_mark: | SHA-2 digests |
+| sha2 | :check_mark: | SHA-2 digests |
 
 ### Key/signature types
 
 | **feature** | **default** | **description** |
 |-------------|:-----------:|-----------------|
 | dsa | | DSA signatures |
-| rsa | :heavy_check_mark: | RSA signatures |
-| k256 | :heavy_check_mark: | secp256k1 ECDSA signatures |
+| rsa | :check_mark: | RSA signatures |
+| k256 | :check_mark: | secp256k1 ECDSA signatures |
 | p192 | | secp192r1 ECDSA signatures |
 | p224 | | secp224r1 ECDSA signatures |
-| p256 | :heavy_check_mark: | secp256r1 ECDSA signatures |
-| p384 | :heavy_check_mark: | secp284r1 ECDSA signatures |
+| p256 | :check_mark: | secp256r1 ECDSA signatures |
+| p384 | :check_mark: | secp284r1 ECDSA signatures |
 | ecc | | k256, p192, p224, p256, and p384 |
 | ed25519 | | Ed25519 signatures |
 
