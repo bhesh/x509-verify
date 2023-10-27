@@ -6,7 +6,7 @@ A pure Rust, no standard library implementation of X.509 verification. Makes use
 [X.509 formats](https://github.com/RustCrypto/formats),
 [DSA](https://github.com/RustCrypto/signatures/tree/master/dsa),
 [RSA](https://github.com/RustCrypto/RSA), and
-[ECDSA](https://github.com/RustCrypto/signatures/tree/master/ecdsa). And 
+[ECDSA](https://github.com/RustCrypto/signatures/tree/master/ecdsa). And
 [dalek](https://github.com/dalek-cryptography) 's version of
 [Ed25519](https://github.com/dalek-cryptography/curve25519-dalek).
 
@@ -28,8 +28,8 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 
 ### DSA
 
-- `DSA_WITH_SHA_1` (features: `dsa`, `sha1`)
-- `DSA_WITH_SHA_224` (feature: `dsa`)
+    - `DSA_WITH_SHA_1` (features: `dsa`, `sha1`)
+    - `DSA_WITH_SHA_224` (feature: `dsa`)
 - `DSA_WITH_SHA_256` (feature: `dsa`)
 
 ### EdDsa
@@ -38,32 +38,32 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 
 ### RSA
 
-- `MD_2_WITH_RSA_ENCRYPTION` (feature: `md2`)
-- `MD_5_WITH_RSA_ENCRYPTION` (feature: `md5`)
+    - `MD_2_WITH_RSA_ENCRYPTION` (feature: `md2`)
+    - `MD_5_WITH_RSA_ENCRYPTION` (feature: `md5`)
 - `SHA_1_WITH_RSA_ENCRYPTION` (feature: `sha1`)
-- `SHA_224_WITH_RSA_ENCRYPTION`
-- `SHA_256_WITH_RSA_ENCRYPTION`
-- `SHA_384_WITH_RSA_ENCRYPTION`
-- `SHA_512_WITH_RSA_ENCRYPTION`
+    - `SHA_224_WITH_RSA_ENCRYPTION`
+    - `SHA_256_WITH_RSA_ENCRYPTION`
+    - `SHA_384_WITH_RSA_ENCRYPTION`
+    - `SHA_512_WITH_RSA_ENCRYPTION`
 
 ### ECDSA
 
-- `ECDSA_WITH_SHA_224`
-- `ECDSA_WITH_SHA_256`
-- `ECDSA_WITH_SHA_384`
-- `ECDSA_WITH_SHA_512`
+    - `ECDSA_WITH_SHA_224`
+    - `ECDSA_WITH_SHA_256`
+    - `ECDSA_WITH_SHA_384`
+    - `ECDSA_WITH_SHA_512`
 
 ### EC Curves
 
-- [k256](https://github.com/RustCrypto/elliptic-curves/tree/master/k256)
-- [p192](https://github.com/RustCrypto/elliptic-curves/tree/master/p192) (feature: `p192`)
-- [p224](https://github.com/RustCrypto/elliptic-curves/tree/master/p224) (feature: `p224`)
-- [p256](https://github.com/RustCrypto/elliptic-curves/tree/master/p256)
-- [p384](https://github.com/RustCrypto/elliptic-curves/tree/master/p384)
+    - [k256](https://github.com/RustCrypto/elliptic-curves/tree/master/k256)
+    - [p192](https://github.com/RustCrypto/elliptic-curves/tree/master/p192) (feature: `p192`)
+    - [p224](https://github.com/RustCrypto/elliptic-curves/tree/master/p224) (feature: `p224`)
+    - [p256](https://github.com/RustCrypto/elliptic-curves/tree/master/p256)
+    - [p384](https://github.com/RustCrypto/elliptic-curves/tree/master/p384)
 
 ## Verification
 
-```rust
+    ```rust
 #[cfg(all(feature = "rsa", feature = "sha2"))]
 {
     use der::{DecodePem, Encode};
@@ -79,11 +79,11 @@ Some of the features of this crate are in an early, experimental phase. Use at y
         .to_der()
         .expect("error encoding message");
     let sig = X509Signature::new(
-        &cert.signature_algorithm,
-        cert.signature
+            &cert.signature_algorithm,
+            cert.signature
             .as_bytes()
             .expect("signature is not octet-aligned"),
-    );
+            );
 
     let key: X509VerifyingKey = cert
         .tbs_certificate
@@ -103,8 +103,8 @@ Some of the features of this crate are in an early, experimental phase. Use at y
     use std::{io::Read, fs};
     use x509_verify::{
         x509_cert::{crl::CertificateList, Certificate},
-        x509_ocsp::{BasicOcspResponse, OcspResponse, OcspResponseStatus},
-        X509Message, X509Signature, X509VerifyingKey,
+            x509_ocsp::{BasicOcspResponse, OcspResponse, OcspResponseStatus},
+            X509Message, X509Signature, X509VerifyingKey,
     };
 
     // CA-signed certificate
@@ -136,12 +136,12 @@ Some of the features of this crate are in an early, experimental phase. Use at y
     let res = OcspResponse::from_der(&data).expect("error decoding OcspRequest");
     assert_eq!(res.response_status, OcspResponseStatus::Successful);
     let res = BasicOcspResponse::from_der(
-        res.response_bytes
+            res.response_bytes
             .expect("no response data")
             .response
             .as_bytes(),
-    )
-    .expect("error decoding BasicOcspResponse");
+            )
+        .expect("error decoding BasicOcspResponse");
     let pem = fs::read_to_string("testdata/digicert-ca.pem").expect("error reading file");
     let ca = Certificate::from_pem(&pem).expect("error decoding signing cert");
 
@@ -181,7 +181,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 | **feature** | **default** | **description** |
 |-------------|:-----------:|-----------------|
 | x509 | | enables X.509 structure conversion |
-| pem | | requires x509 and adds the [`DecodePem`] trait to reimports |
+| pem | | requires x509 and adds the `DecodePem` trait to reimports |
 
 ## License
 
