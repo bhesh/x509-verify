@@ -40,7 +40,7 @@ ocsp-x509 = { version = "0.1.1", optional = true, default-features = false }
 x509-cert = { version = "0.2.4", default-features = false, features = ["pem"] }
 
 [features]
-default = [ "sha2", "rsa", "k256", "p256", "p384" ]
+default = [ "sha2", "rsa", "k256", "p256", "p384", "ed25519" ]
 md2 = [ "dep:md2" ]
 md5 = [ "dep:md-5" ]
 sha1 = [ "dep:sha1" ]

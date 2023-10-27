@@ -167,7 +167,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 | p256 | :white_check_mark: | secp256r1 ECDSA signatures |
 | p384 | :white_check_mark: | secp284r1 ECDSA signatures |
 | ecdsa | | k256, p192, p224, p256, and p384 |
-| ed25519 | | Ed25519 signatures |
+| ed25519 | :white_check_mark: | Ed25519 signatures |
 | x509 | | enables X.509 structure conversion |
 | pem | | adds the `DecodePem` trait to X.509 reimports |
 
