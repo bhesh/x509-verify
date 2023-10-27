@@ -6,7 +6,9 @@ A pure Rust, no standard library implementation of X.509 verification. Makes use
 [X.509 formats](https://github.com/RustCrypto/formats),
 [DSA](https://github.com/RustCrypto/signatures/tree/master/dsa),
 [RSA](https://github.com/RustCrypto/RSA), and
-[ECDSA](https://github.com/RustCrypto/signatures/tree/master/ecdsa).
+[ECDSA](https://github.com/RustCrypto/signatures/tree/master/ecdsa). And 
+[dalek](https://github.com/dalek-cryptography) 's version of
+[Ed25519](https://github.com/dalek-cryptography/curve25519-dalek).
 
 The goal of this crate is to provide a general means of verification for common X.509 algorithm identifiers.
 It aims to abstract away some of the verification nuances of signatures within X.509 structures. Such as:
@@ -29,6 +31,10 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 - `DSA_WITH_SHA_1` (features: `dsa`, `sha1`)
 - `DSA_WITH_SHA_224` (feature: `dsa`)
 - `DSA_WITH_SHA_256` (feature: `dsa`)
+
+### EdDsa
+
+- `ED25519` (feature: `ed25519`)
 
 ### RSA
 
@@ -149,32 +155,33 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 
 ### Digests
 
-Enables specific digest algorithms.
-
- - md2
- - md5
- - sha1
- - sha2 (default)
+| **feature** | **default** | **description** |
+|-------------|:-----------:|-----------------|
+| md2 | | MD-2 digests |
+| md5 | | MD-5 digests |
+| sha1 | | SHA-1 digests |
+| sha2 | :heavy_check_mark: | SHA-2 digests |
 
 ### Key/signature types
 
-Enables specific key and signature algorithms.
-
- - dsa
- - rsa (default)
- - k256 (default)
- - p192
- - p224
- - p256 (default)
- - p384 (default)
- - ecc (includes all EC types listed above)
+| **feature** | **default** | **description** |
+|-------------|:-----------:|-----------------|
+| dsa | | DSA signatures |
+| rsa | :heavy_check_mark: | RSA signatures |
+| k256 | :heavy_check_mark: | secp256k1 ECDSA signatures |
+| p192 | | secp192r1 ECDSA signatures |
+| p224 | | secp224r1 ECDSA signatures |
+| p256 | :heavy_check_mark: | secp256r1 ECDSA signatures |
+| p384 | :heavy_check_mark: | secp284r1 ECDSA signatures |
+| ecc | | k256, p192, p224, p256, and p384 |
+| ed25519 | | Ed25519 signatures |
 
 ### X.509
 
-Enables X.509 object conversion into key/message/signature structures.
-
- - x509
- - pem (requires x509 and adds the `DecodePem` trait to reimports)
+| **feature** | **default** | **description** |
+|-------------|:-----------:|-----------------|
+| x509 | | enables X.509 structure conversion |
+| pem | | requires x509 and adds the [`DecodePem`] trait to reimports |
 
 ## License
 
