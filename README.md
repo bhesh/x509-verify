@@ -63,7 +63,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 
 ## Verification
 
-    ```rust
+```rust
 #[cfg(all(feature = "rsa", feature = "sha2"))]
 {
     use der::{DecodePem, Encode};
