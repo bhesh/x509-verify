@@ -173,7 +173,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 | p224 | | secp224r1 ECDSA signatures |
 | p256 | :white_check_mark: | secp256r1 ECDSA signatures |
 | p384 | :white_check_mark: | secp284r1 ECDSA signatures |
-| ecc | | k256, p192, p224, p256, and p384 |
+| ecdsa | | k256, p192, p224, p256, and p384 |
 | ed25519 | | Ed25519 signatures |
 
 ### X.509
