@@ -32,7 +32,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 - `DSA_WITH_SHA_224` (feature: `dsa`)
 - `DSA_WITH_SHA_256` (feature: `dsa`)
 
-### EdDsa
+### EdDSA
 
 - `ED25519` (feature: `ed25519`)
 
