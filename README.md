@@ -56,8 +56,8 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 ### EC Curves
 
 - [k256](https://github.com/RustCrypto/elliptic-curves/tree/master/k256)
-- [p192](https://github.com/RustCrypto/elliptic-curves/tree/master/p192) (feature: `p192`)
-- [p224](https://github.com/RustCrypto/elliptic-curves/tree/master/p224) (feature: `p224`)
+- [p192](https://github.com/RustCrypto/elliptic-curves/tree/master/p192)
+- [p224](https://github.com/RustCrypto/elliptic-curves/tree/master/p224)
 - [p256](https://github.com/RustCrypto/elliptic-curves/tree/master/p256)
 - [p384](https://github.com/RustCrypto/elliptic-curves/tree/master/p384)
 
