@@ -22,7 +22,7 @@ mod signature;
 pub use signature::X509Signature;
 
 mod verify;
-pub use verify::X509VerifyKey;
+pub use verify::X509VerifyingKey;
 
 #[cfg(feature = "x509")]
 mod x509;

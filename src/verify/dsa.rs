@@ -1,4 +1,4 @@
-//! DSA VerifyKey
+//! DSA VerifyingKey
 
 use crate::{Error, X509Signature};
 use const_oid::AssociatedOid;
@@ -23,16 +23,16 @@ const DSA_WITH_SHA_224: ObjectIdentifier = ObjectIdentifier::new_unwrap("2.16.84
 const DSA_WITH_SHA_256: ObjectIdentifier = ObjectIdentifier::new_unwrap("2.16.840.1.101.3.4.3.2");
 
 #[derive(Clone, Debug)]
-pub struct X509DsaVerifyKey {
+pub struct X509DsaVerifyingKey {
     key: VerifyingKey,
 }
 
-impl AssociatedOid for X509DsaVerifyKey {
+impl AssociatedOid for X509DsaVerifyingKey {
     // ID_DSA
     const OID: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10040.4.1");
 }
 
-impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509DsaVerifyKey {
+impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509DsaVerifyingKey {
     type Error = Error;
 
     fn try_from(other: SubjectPublicKeyInfoRef<'_>) -> Result<Self, Self::Error> {
@@ -42,7 +42,7 @@ impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509DsaVerifyKey {
     }
 }
 
-impl X509DsaVerifyKey {
+impl X509DsaVerifyingKey {
     pub fn verify(&self, msg: &[u8], signature: &X509Signature<'_, '_>) -> Result<(), Error> {
         let sig = Signature::try_from(signature.data()).or(Err(Error::InvalidSignature))?;
         match signature.oid() {

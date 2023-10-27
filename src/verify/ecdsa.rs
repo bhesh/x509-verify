@@ -1,4 +1,4 @@
-//! ECDSA VerifyKey
+//! ECDSA VerifyingKey
 
 use crate::{Error, X509Signature};
 use const_oid::AssociatedOid;
@@ -38,7 +38,7 @@ const ECDSA_WITH_SHA_384: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.8
 const ECDSA_WITH_SHA_512: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.4.3.4");
 
 #[derive(Clone, Debug)]
-pub enum X509EcdsaVerifyKey {
+pub enum X509EcdsaVerifyingKey {
     #[cfg(feature = "k256")]
     K256(VerifyingKey<k256::Secp256k1>),
 
@@ -55,7 +55,7 @@ pub enum X509EcdsaVerifyKey {
     P384(VerifyingKey<p384::NistP384>),
 }
 
-impl X509EcdsaVerifyKey {
+impl X509EcdsaVerifyingKey {
     fn verify_prehash(
         &self,
         prehash: &[u8],
@@ -105,12 +105,12 @@ impl X509EcdsaVerifyKey {
     }
 }
 
-impl AssociatedOid for X509EcdsaVerifyKey {
+impl AssociatedOid for X509EcdsaVerifyingKey {
     // ID_EC_PUBLIC_KEY
     const OID: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.2.1");
 }
 
-impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509EcdsaVerifyKey {
+impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509EcdsaVerifyingKey {
     type Error = Error;
 
     fn try_from(other: SubjectPublicKeyInfoRef<'_>) -> Result<Self, Self::Error> {
@@ -159,7 +159,7 @@ impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509EcdsaVerifyKey {
     }
 }
 
-impl X509EcdsaVerifyKey {
+impl X509EcdsaVerifyingKey {
     pub fn verify(&self, msg: &[u8], signature: &X509Signature<'_, '_>) -> Result<(), Error> {
         match signature.oid() {
             #[cfg(feature = "sha2")]

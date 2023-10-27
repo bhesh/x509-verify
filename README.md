@@ -63,7 +63,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
     use der::{DecodePem, Encode};
     use std::fs;
     use x509_cert::Certificate;
-    use x509_verify::{X509Message, X509Signature, X509VerifyKey};
+    use x509_verify::{X509Message, X509Signature, X509VerifyingKey};
 
     // Self-signed certificate
     let pem = fs::read_to_string("testdata/rsa2048-sha256-crt.pem").expect("error reading file");
@@ -79,7 +79,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
             .expect("signature is not octet-aligned"),
     );
 
-    let key: X509VerifyKey = cert
+    let key: X509VerifyingKey = cert
         .tbs_certificate
         .subject_public_key_info
         .try_into()
@@ -98,7 +98,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
     use x509_verify::{
         x509_cert::{crl::CertificateList, Certificate},
         x509_ocsp::{BasicOcspResponse, OcspResponse, OcspResponseStatus},
-        X509Message, X509Signature, X509VerifyKey,
+        X509Message, X509Signature, X509VerifyingKey,
     };
 
     // CA-signed certificate
@@ -108,7 +108,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
     let cert = Certificate::from_pem(&pem).expect("error decoding signing cert");
 
     // Verify
-    let key = X509VerifyKey::try_from(&ca).expect("error making key");
+    let key = X509VerifyingKey::try_from(&ca).expect("error making key");
     key.verify(&cert, &cert).expect("error verifying");
 
     // CA-signed CRL
@@ -120,7 +120,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
     let ca = Certificate::from_pem(&pem).expect("error decoding signing cert");
 
     // Verify
-    let key = X509VerifyKey::try_from(&ca).expect("error making key");
+    let key = X509VerifyingKey::try_from(&ca).expect("error making key");
     key.verify(&crl, &crl).expect("error verifying");
 
     // CA-signed OCSP response
@@ -140,7 +140,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
     let ca = Certificate::from_pem(&pem).expect("error decoding signing cert");
 
     // Verify
-    let key = X509VerifyKey::try_from(&ca).expect("error making key");
+    let key = X509VerifyingKey::try_from(&ca).expect("error making key");
     key.verify(&res, &res).expect("error verifying");
 }
 ```

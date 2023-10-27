@@ -32,6 +32,7 @@ p192 = { version = "0.13.0", optional = true, default-features = false, features
 p224 = { version = "0.13.2", optional = true, default-features = false, features = ["ecdsa"] }
 p256 = { version = "0.13.2", optional = true, default-features = false, features = ["ecdsa"] }
 p384 = { version = "0.13.0", optional = true, default-features = false, features = ["ecdsa"] }
+ed25519-dalek = { version = "2.0.0", optional = true, default-features = false }
 x509-cert = { version = "0.2.4", optional = true, default-features = false }
 ocsp-x509 = { version = "0.1.1", optional = true, default-features = false }
 
@@ -52,9 +53,9 @@ p192 = [ "sha2", "dep:ecdsa", "dep:p192" ]
 p224 = [ "sha2", "dep:ecdsa", "dep:p224" ]
 p256 = [ "sha2", "dep:ecdsa", "dep:p256" ]
 p384 = [ "sha2", "dep:ecdsa", "dep:p384" ]
+ed25519 = [ "sha2", "dep:ed25519-dalek" ]
 x509 = [ "dep:x509-cert", "dep:ocsp-x509" ]
 pem = [ "x509", "x509-cert/pem" ]
-all = [ "md2", "md5", "sha1", "sha2", "dsa", "rsa", "ecc", "x509" ]
 
 [package.metadata.docs.rs]
 all-features = true

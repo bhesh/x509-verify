@@ -1,7 +1,7 @@
 use der::{referenced::OwnedToRef, DecodePem, Encode};
 use std::fmt::Debug;
 use x509_cert::Certificate;
-use x509_verify::{Error, X509Message, X509Signature, X509VerifyKey};
+use x509_verify::{Error, X509Message, X509Signature, X509VerifyingKey};
 
 #[macro_export]
 macro_rules! read_der {
@@ -34,7 +34,7 @@ pub fn self_signed_good(filename: &str) {
             .as_bytes()
             .expect("signature is not octet-aligned"),
     );
-    let key: X509VerifyKey = cert
+    let key: X509VerifyingKey = cert
         .tbs_certificate
         .subject_public_key_info
         .try_into()
@@ -51,7 +51,7 @@ pub fn self_signed_bad(filename: &str) {
             .as_bytes()
             .expect("signature is not octet-aligned"),
     );
-    let key: X509VerifyKey = cert
+    let key: X509VerifyingKey = cert
         .tbs_certificate
         .subject_public_key_info
         .try_into()
@@ -72,7 +72,7 @@ pub fn self_signed_bad_oid(filename: &str) {
             .as_bytes()
             .expect("signature is not octet-aligned"),
     );
-    match X509VerifyKey::try_from(cert.tbs_certificate.subject_public_key_info.owned_to_ref()) {
+    match X509VerifyingKey::try_from(cert.tbs_certificate.subject_public_key_info.owned_to_ref()) {
         Ok(v) => match v.verify("".as_bytes(), &sig) {
             Ok(_) => panic!("should not have been good"),
             Err(Error::UnknownOid(_)) => {}
@@ -86,7 +86,7 @@ pub fn self_signed_bad_oid(filename: &str) {
 #[allow(dead_code)]
 pub fn x509_verify_good<'a, K, M, B, S>(key: K, msg: M, signature: S)
 where
-    K: TryInto<X509VerifyKey>,
+    K: TryInto<X509VerifyingKey>,
     K::Error: Debug,
     M: TryInto<X509Message<B>>,
     M::Error: Debug,
@@ -94,19 +94,19 @@ where
     S: TryInto<X509Signature<'a, 'a>>,
     S::Error: Debug,
 {
-    let key: X509VerifyKey = key.try_into().expect("error making key");
+    let key: X509VerifyingKey = key.try_into().expect("error making key");
     key.verify(msg, signature).expect("error verifying");
 }
 
 #[allow(dead_code)]
 pub fn x509_verify_bad<'a, K, S>(key: K, signature: S)
 where
-    K: TryInto<X509VerifyKey>,
+    K: TryInto<X509VerifyingKey>,
     K::Error: Debug,
     S: TryInto<X509Signature<'a, 'a>>,
     S::Error: Debug,
 {
-    let key: X509VerifyKey = key.try_into().expect("error making key");
+    let key: X509VerifyingKey = key.try_into().expect("error making key");
     match key.verify("".as_bytes(), signature) {
         Ok(_) => panic!("should not have been good"),
         Err(Error::Verification) => {}

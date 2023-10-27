@@ -1,6 +1,6 @@
-//! X.509 Verify Implementations
+//! X.509 Structure Conversions
 
-use crate::{Error, X509MessageOwned, X509Signature, X509VerifyKey};
+use crate::{Error, X509MessageOwned, X509Signature, X509VerifyingKey};
 use core::result::Result;
 use der::{referenced::OwnedToRef, Encode};
 use ocsp_x509::{BasicOcspResponse, OcspRequest};
@@ -26,7 +26,7 @@ macro_rules! impl_as_message {
     };
 }
 
-impl TryFrom<&Certificate> for X509VerifyKey {
+impl TryFrom<&Certificate> for X509VerifyingKey {
     type Error = Error;
 
     fn try_from(cert: &Certificate) -> Result<Self, Self::Error> {
@@ -37,10 +37,10 @@ impl TryFrom<&Certificate> for X509VerifyKey {
     }
 }
 
-impl TryFrom<Certificate> for X509VerifyKey {
+impl TryFrom<Certificate> for X509VerifyingKey {
     type Error = Error;
     fn try_from(other: Certificate) -> Result<Self, Self::Error> {
-        X509VerifyKey::try_from(&other)
+        X509VerifyingKey::try_from(&other)
     }
 }
 
