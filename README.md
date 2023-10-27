@@ -79,11 +79,11 @@ Some of the features of this crate are in an early, experimental phase. Use at y
         .to_der()
         .expect("error encoding message");
     let sig = X509Signature::new(
-            &cert.signature_algorithm,
-            cert.signature
+        &cert.signature_algorithm,
+        cert.signature
             .as_bytes()
             .expect("signature is not octet-aligned"),
-            );
+    );
 
     let key: X509VerifyingKey = cert
         .tbs_certificate
@@ -103,8 +103,8 @@ Some of the features of this crate are in an early, experimental phase. Use at y
     use std::{io::Read, fs};
     use x509_verify::{
         x509_cert::{crl::CertificateList, Certificate},
-            x509_ocsp::{BasicOcspResponse, OcspResponse, OcspResponseStatus},
-            X509Message, X509Signature, X509VerifyingKey,
+        x509_ocsp::{BasicOcspResponse, OcspResponse, OcspResponseStatus},
+        X509Message, X509Signature, X509VerifyingKey,
     };
 
     // CA-signed certificate
@@ -136,12 +136,12 @@ Some of the features of this crate are in an early, experimental phase. Use at y
     let res = OcspResponse::from_der(&data).expect("error decoding OcspRequest");
     assert_eq!(res.response_status, OcspResponseStatus::Successful);
     let res = BasicOcspResponse::from_der(
-            res.response_bytes
+        res.response_bytes
             .expect("no response data")
             .response
             .as_bytes(),
-            )
-        .expect("error decoding BasicOcspResponse");
+    )
+    .expect("error decoding BasicOcspResponse");
     let pem = fs::read_to_string("testdata/digicert-ca.pem").expect("error reading file");
     let ca = Certificate::from_pem(&pem).expect("error decoding signing cert");
 
