@@ -115,28 +115,34 @@ Some of the features of this crate are in an early, experimental phase. Use at y
     };
 
     // CA-signed certificate
+
     let pem = fs::read_to_string("testdata/digicert-ca.pem").expect("error reading file");
     let ca = Certificate::from_pem(&pem).expect("error decoding signing cert");
+
     let pem = fs::read_to_string("testdata/amazon-crt.pem").expect("error reading file");
     let cert = Certificate::from_pem(&pem).expect("error decoding signing cert");
 
-    // Verify
     let key = VerifyingKey::try_from(&ca).expect("error making key");
     key.verify(&cert).expect("error verifying");
 
     // CA-signed CRL
+
+    let pem = fs::read_to_string("testdata/GoodCACert.pem").expect("error reading file");
+    let ca = Certificate::from_pem(&pem).expect("error decoding signing cert");
+
     let mut f = fs::File::open("testdata/GoodCACRL.crl").expect("error opening file");
     let mut data = Vec::new();
     f.read_to_end(&mut data).expect("error reading file");
     let crl = CertificateList::from_der(&data).expect("error decoding CRL");
-    let pem = fs::read_to_string("testdata/GoodCACert.pem").expect("error reading file");
-    let ca = Certificate::from_pem(&pem).expect("error decoding signing cert");
 
-    // Verify
     let key = VerifyingKey::try_from(&ca).expect("error making key");
     key.verify(&crl).expect("error verifying");
 
     // CA-signed OCSP response
+
+    let pem = fs::read_to_string("testdata/digicert-ca.pem").expect("error reading file");
+    let ca = Certificate::from_pem(&pem).expect("error decoding signing cert");
+
     let mut f = fs::File::open("testdata/ocsp-amazon-resp.der").expect("error opening file");
     let mut data = Vec::new();
     f.read_to_end(&mut data).expect("error reading file");
@@ -149,10 +155,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
             .as_bytes(),
     )
     .expect("error decoding BasicOcspResponse");
-    let pem = fs::read_to_string("testdata/digicert-ca.pem").expect("error reading file");
-    let ca = Certificate::from_pem(&pem).expect("error decoding signing cert");
 
-    // Verify
     let key = VerifyingKey::try_from(&ca).expect("error making key");
     key.verify(&res).expect("error verifying");
 }
