@@ -1,11 +1,9 @@
-#[allow(unused_imports)]
+#![allow(unused_imports)]
 mod helpers;
-#[allow(unused_imports)]
 use helpers::*;
 
 #[cfg(feature = "rsa")]
 mod rsa_tests {
-    #[allow(unused_imports)]
     use crate::{helpers::*, *};
 
     #[cfg(feature = "x509")]
@@ -30,7 +28,7 @@ mod rsa_tests {
     #[test]
     fn x509_rsa_with_sha1_good() {
         let cert = read_pem!(Certificate, "testdata/rsa2048-sha1-crt.pem");
-        x509_verify_good(&cert, &cert, &cert);
+        x509_verify_good(&cert, &cert);
     }
 
     #[cfg(all(feature = "sha1", feature = "x509"))]
@@ -56,7 +54,7 @@ mod rsa_tests {
     #[test]
     fn x509_rsa_with_sha256_good() {
         let cert = read_pem!(Certificate, "testdata/rsa2048-sha256-crt.pem");
-        x509_verify_good(&cert, &cert, &cert);
+        x509_verify_good(&cert, &cert);
     }
 
     #[cfg(all(feature = "sha2", feature = "x509"))]

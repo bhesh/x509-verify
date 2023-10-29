@@ -1,11 +1,9 @@
-#[allow(unused_imports)]
+#![allow(unused_imports)]
 mod helpers;
-#[allow(unused_imports)]
 use helpers::*;
 
 #[cfg(feature = "p384")]
 mod p384_tests {
-    #[allow(unused_imports)]
     use crate::{helpers::*, *};
 
     #[cfg(feature = "x509")]
@@ -30,7 +28,7 @@ mod p384_tests {
     #[test]
     fn x509_p384_with_sha384_good() {
         let cert = read_pem!(Certificate, "testdata/secp384r1-sha384-crt.pem");
-        x509_verify_good(&cert, &cert, &cert);
+        x509_verify_good(&cert, &cert);
     }
 
     #[cfg(all(feature = "sha2", feature = "x509"))]

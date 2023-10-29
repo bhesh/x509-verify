@@ -1,7 +1,8 @@
+#![allow(dead_code)]
 use der::{referenced::OwnedToRef, DecodePem, Encode};
 use std::fmt::Debug;
 use x509_cert::Certificate;
-use x509_verify::{Error, X509Message, X509Signature, X509VerifyingKey};
+use x509_verify::{Error, X509Signature, X509VerifyInfo, X509VerifyingKey};
 
 #[macro_export]
 macro_rules! read_der {
@@ -21,7 +22,6 @@ macro_rules! read_pem {
     };
 }
 
-#[allow(dead_code)]
 pub fn self_signed_good(filename: &str) {
     let cert = read_pem!(Certificate, filename);
     let msg = cert
@@ -39,10 +39,10 @@ pub fn self_signed_good(filename: &str) {
         .subject_public_key_info
         .try_into()
         .expect("error making key");
-    key.verify(&msg, &sig).expect("verify failed");
+    key.verify(&X509VerifyInfo::new(msg.into(), sig))
+        .expect("verify failed");
 }
 
-#[allow(dead_code)]
 pub fn self_signed_bad(filename: &str) {
     let cert = read_pem!(Certificate, filename);
     let sig = X509Signature::new(
@@ -56,14 +56,13 @@ pub fn self_signed_bad(filename: &str) {
         .subject_public_key_info
         .try_into()
         .expect("error making key");
-    match key.verify("".as_bytes(), &sig) {
+    match key.verify(&X509VerifyInfo::new("".as_bytes().into(), sig)) {
         Ok(_) => panic!("should not have been good"),
         Err(Error::Verification) => {}
         Err(e) => panic!("{:?}", e),
     }
 }
 
-#[allow(dead_code)]
 pub fn self_signed_bad_oid(filename: &str) {
     let cert = read_pem!(Certificate, filename);
     let sig = X509Signature::new(
@@ -73,7 +72,7 @@ pub fn self_signed_bad_oid(filename: &str) {
             .expect("signature is not octet-aligned"),
     );
     match X509VerifyingKey::try_from(cert.tbs_certificate.subject_public_key_info.owned_to_ref()) {
-        Ok(v) => match v.verify("".as_bytes(), &sig) {
+        Ok(v) => match v.verify(&X509VerifyInfo::new("".as_bytes().into(), sig)) {
             Ok(_) => panic!("should not have been good"),
             Err(Error::UnknownOid(_)) => {}
             Err(e) => panic!("{:?}", e),
@@ -83,22 +82,21 @@ pub fn self_signed_bad_oid(filename: &str) {
     }
 }
 
-#[allow(dead_code)]
-pub fn x509_verify_good<'a, K, M, B, S>(key: K, msg: M, signature: S)
+pub fn x509_verify_good<'a, K, V, B>(key: K, verify_info: V)
 where
     K: TryInto<X509VerifyingKey>,
     K::Error: Debug,
-    M: TryInto<X509Message<B>>,
-    M::Error: Debug,
+    V: TryInto<X509VerifyInfo<'a, 'a, B>>,
+    V::Error: Debug,
     B: AsRef<[u8]>,
-    S: TryInto<X509Signature<'a, 'a>>,
-    S::Error: Debug,
 {
     let key: X509VerifyingKey = key.try_into().expect("error making key");
-    key.verify(msg, signature).expect("error verifying");
+    let verify_info = verify_info
+        .try_into()
+        .expect("error making message or signature");
+    key.verify(&verify_info).expect("error verifying");
 }
 
-#[allow(dead_code)]
 pub fn x509_verify_bad<'a, K, S>(key: K, signature: S)
 where
     K: TryInto<X509VerifyingKey>,
@@ -107,7 +105,11 @@ where
     S::Error: Debug,
 {
     let key: X509VerifyingKey = key.try_into().expect("error making key");
-    match key.verify("".as_bytes(), signature) {
+    let verify_info = X509VerifyInfo::new(
+        "".as_bytes().into(),
+        signature.try_into().expect("error making signature"),
+    );
+    match key.verify(&verify_info) {
         Ok(_) => panic!("should not have been good"),
         Err(Error::Verification) => {}
         Err(e) => panic!("{:?}", e),

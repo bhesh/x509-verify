@@ -1,11 +1,9 @@
-#[allow(unused_imports)]
+#![allow(unused_imports)]
 mod helpers;
-#[allow(unused_imports)]
 use helpers::*;
 
 #[cfg(feature = "ed25519")]
 mod ed25519_tests {
-    #[allow(unused_imports)]
     use crate::{helpers::*, *};
 
     #[cfg(feature = "x509")]
@@ -30,7 +28,7 @@ mod ed25519_tests {
     #[test]
     fn x509_ed25519_with_sha512_good() {
         let cert = read_pem!(Certificate, "testdata/ed25519-sha512-crt.pem");
-        x509_verify_good(&cert, &cert, &cert);
+        x509_verify_good(&cert, &cert);
     }
 
     #[cfg(all(feature = "sha2", feature = "x509"))]

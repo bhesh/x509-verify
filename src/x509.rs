@@ -1,6 +1,7 @@
 //! X.509 Structure Conversions
 
-use crate::{Error, X509MessageOwned, X509Signature, X509VerifyingKey};
+use crate::{Error, X509MessageOwned, X509Signature, X509VerifyInfo, X509VerifyingKey};
+use alloc::vec::Vec;
 use core::result::Result;
 use der::{referenced::OwnedToRef, Encode};
 use ocsp_x509::{BasicOcspResponse, OcspRequest};
@@ -12,15 +13,19 @@ macro_rules! impl_as_message {
             type Error = Error;
 
             fn try_from(obj: &$from) -> Result<Self, Self::Error> {
-                Ok(Self::from(obj.$where.to_der()?))
+                Ok(Self::from(obj.$where.to_der().or(Err(Error::Encode))?))
             }
         }
+    };
+}
 
-        impl TryFrom<$from> for X509MessageOwned {
+macro_rules! impl_as_verify_info {
+    ($from:ty) => {
+        impl<'a> TryFrom<&'a $from> for X509VerifyInfo<'a, 'a, Vec<u8>> {
             type Error = Error;
 
-            fn try_from(obj: $from) -> Result<Self, Self::Error> {
-                Self::try_from(&obj)
+            fn try_from(obj: &'a $from) -> Result<Self, Self::Error> {
+                Ok(X509VerifyInfo::new(obj.try_into()?, obj.try_into()?))
             }
         }
     };
@@ -50,12 +55,13 @@ impl<'a> TryFrom<&'a Certificate> for X509Signature<'a, 'a> {
     fn try_from(cert: &'a Certificate) -> Result<Self, Self::Error> {
         Ok(X509Signature::new(
             &cert.signature_algorithm,
-            cert.signature.as_bytes().ok_or(Error::Encoding)?,
+            cert.signature.as_bytes().ok_or(Error::Decode)?,
         ))
     }
 }
 
 impl_as_message!(Certificate, tbs_certificate);
+impl_as_verify_info!(Certificate);
 
 impl<'a> TryFrom<&'a CertificateList> for X509Signature<'a, 'a> {
     type Error = Error;
@@ -63,12 +69,13 @@ impl<'a> TryFrom<&'a CertificateList> for X509Signature<'a, 'a> {
     fn try_from(crl: &'a CertificateList) -> Result<Self, Self::Error> {
         Ok(X509Signature::new(
             &crl.signature_algorithm,
-            crl.signature.as_bytes().ok_or(Error::Encoding)?,
+            crl.signature.as_bytes().ok_or(Error::Decode)?,
         ))
     }
 }
 
 impl_as_message!(CertificateList, tbs_cert_list);
+impl_as_verify_info!(CertificateList);
 
 impl<'a> TryFrom<&'a CertReq> for X509Signature<'a, 'a> {
     type Error = Error;
@@ -76,26 +83,28 @@ impl<'a> TryFrom<&'a CertReq> for X509Signature<'a, 'a> {
     fn try_from(req: &'a CertReq) -> Result<Self, Self::Error> {
         Ok(X509Signature::new(
             &req.algorithm,
-            req.signature.as_bytes().ok_or(Error::Encoding)?,
+            req.signature.as_bytes().ok_or(Error::Decode)?,
         ))
     }
 }
 
 impl_as_message!(CertReq, info);
+impl_as_verify_info!(CertReq);
 
 impl<'a> TryFrom<&'a OcspRequest> for X509Signature<'a, 'a> {
     type Error = Error;
 
     fn try_from(req: &'a OcspRequest) -> Result<Self, Self::Error> {
-        let signature = req.optional_signature.as_ref().ok_or(Error::Encoding)?;
+        let signature = req.optional_signature.as_ref().ok_or(Error::Decode)?;
         Ok(X509Signature::new(
             &signature.signature_algorithm,
-            signature.signature.as_bytes().ok_or(Error::Encoding)?,
+            signature.signature.as_bytes().ok_or(Error::Decode)?,
         ))
     }
 }
 
 impl_as_message!(OcspRequest, tbs_request);
+impl_as_verify_info!(OcspRequest);
 
 impl<'a> TryFrom<&'a BasicOcspResponse> for X509Signature<'a, 'a> {
     type Error = Error;
@@ -103,9 +112,10 @@ impl<'a> TryFrom<&'a BasicOcspResponse> for X509Signature<'a, 'a> {
     fn try_from(res: &'a BasicOcspResponse) -> Result<Self, Self::Error> {
         Ok(X509Signature::new(
             &res.signature_algorithm,
-            res.signature.as_bytes().ok_or(Error::Encoding)?,
+            res.signature.as_bytes().ok_or(Error::Decode)?,
         ))
     }
 }
 
 impl_as_message!(BasicOcspResponse, tbs_response_data);
+impl_as_verify_info!(BasicOcspResponse);

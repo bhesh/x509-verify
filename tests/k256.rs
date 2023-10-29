@@ -1,11 +1,9 @@
-#[allow(unused_imports)]
+#![allow(unused_imports)]
 mod helpers;
-#[allow(unused_imports)]
 use helpers::*;
 
 #[cfg(feature = "k256")]
 mod k256_tests {
-    #[allow(unused_imports)]
     use crate::{helpers::*, *};
 
     #[cfg(feature = "x509")]
@@ -30,7 +28,7 @@ mod k256_tests {
     #[test]
     fn x509_k256_with_sha256_good() {
         let cert = read_pem!(Certificate, "testdata/secp256k1-sha256-crt.pem");
-        x509_verify_good(&cert, &cert, &cert);
+        x509_verify_good(&cert, &cert);
     }
 
     #[cfg(all(feature = "sha2", feature = "x509"))]

@@ -122,7 +122,7 @@ impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509EcdsaVerifyingKey {
                 .ok_or(Error::InvalidKey)?
                 .value(),
         )
-        .or(Err(Error::Encoding))?;
+        .or(Err(Error::Decode))?;
         match &oid {
             #[cfg(feature = "k256")]
             &SECP_256_K_1 => Ok(Self::K256(

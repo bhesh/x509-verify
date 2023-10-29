@@ -62,7 +62,8 @@ impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509RsaVerifyingKey {
 
     fn try_from(other: SubjectPublicKeyInfoRef<'_>) -> Result<Self, Self::Error> {
         Ok(Self {
-            key: RsaPublicKey::from_public_key_der(&other.to_der()?)?,
+            key: RsaPublicKey::from_public_key_der(&other.to_der().or(Err(Error::Encode))?)
+                .or(Err(Error::Decode))?,
         })
     }
 }

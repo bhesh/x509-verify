@@ -69,20 +69,22 @@ Some of the features of this crate are in an early, experimental phase. Use at y
     use der::{DecodePem, Encode};
     use std::fs;
     use x509_cert::Certificate;
-    use x509_verify::{X509Message, X509Signature, X509VerifyingKey};
+    use x509_verify::{X509Signature, X509VerifyInfo, X509VerifyingKey};
 
     // Self-signed certificate
     let pem = fs::read_to_string("testdata/rsa2048-sha256-crt.pem").expect("error reading file");
     let cert = Certificate::from_pem(&pem).expect("error formatting signing cert");
 
-    let msg = cert.tbs_certificate
-        .to_der()
-        .expect("error encoding message");
-    let sig = X509Signature::new(
-        &cert.signature_algorithm,
-        cert.signature
-            .as_bytes()
-            .expect("signature is not octet-aligned"),
+    let verify_info = X509VerifyInfo::new(
+        cert.tbs_certificate
+            .to_der()
+            .expect("error encoding message").into(),
+        X509Signature::new(
+            &cert.signature_algorithm,
+            cert.signature
+                .as_bytes()
+                .expect("signature is not octet-aligned"),
+        ),
     );
 
     let key: X509VerifyingKey = cert
@@ -90,7 +92,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
         .subject_public_key_info
         .try_into()
         .expect("error making key");
-    key.verify(&msg, &sig).expect("error verifying");
+    key.verify(&verify_info).expect("error verifying");
 }
 ```
 
@@ -104,7 +106,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
     use x509_verify::{
         x509_cert::{crl::CertificateList, Certificate},
         x509_ocsp::{BasicOcspResponse, OcspResponse, OcspResponseStatus},
-        X509Message, X509Signature, X509VerifyingKey,
+        X509VerifyInfo, X509VerifyingKey,
     };
 
     // CA-signed certificate
@@ -115,7 +117,8 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 
     // Verify
     let key = X509VerifyingKey::try_from(&ca).expect("error making key");
-    key.verify(&cert, &cert).expect("error verifying");
+    let verify_info = X509VerifyInfo::try_from(&cert).expect("error making message or signature");
+    key.verify(&verify_info).expect("error verifying");
 
     // CA-signed CRL
     let mut f = fs::File::open("testdata/GoodCACRL.crl").expect("error opening file");
@@ -127,7 +130,8 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 
     // Verify
     let key = X509VerifyingKey::try_from(&ca).expect("error making key");
-    key.verify(&crl, &crl).expect("error verifying");
+    let verify_info = X509VerifyInfo::try_from(&crl).expect("error making message or signature");
+    key.verify(&verify_info).expect("error verifying");
 
     // CA-signed OCSP response
     let mut f = fs::File::open("testdata/ocsp-amazon-resp.der").expect("error opening file");
@@ -147,7 +151,8 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 
     // Verify
     let key = X509VerifyingKey::try_from(&ca).expect("error making key");
-    key.verify(&res, &res).expect("error verifying");
+    let verify_info = X509VerifyInfo::try_from(&res).expect("error making message or signature");
+    key.verify(&verify_info).expect("error verifying");
 }
 ```
 
