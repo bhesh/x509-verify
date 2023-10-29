@@ -2,7 +2,7 @@
 name = "x509-verify"
 version = "0.4.0"
 description = """
-Pure Rust library that verifies X.509 signatures based on the signature algorithm identifiers
+Pure Rust library that verifies X.509 signatures based on the algorithm identifiers
 """
 authors = ["Brian Hession"]
 license = "Apache-2.0 OR MIT"
