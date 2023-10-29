@@ -21,7 +21,7 @@ pub use message::{Message, MessageOwned, MessageRef};
 mod signature;
 pub use signature::{Signature, SignatureOwned, SignatureRef};
 
-pub mod verify;
+mod verify;
 pub use verify::{VerifyInfo, VerifyInfoRef, VerifyingKey};
 
 #[cfg(feature = "x509")]

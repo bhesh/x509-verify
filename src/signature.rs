@@ -5,6 +5,9 @@ use der::{asn1::ObjectIdentifier, referenced::OwnedToRef};
 use spki::{AlgorithmIdentifierOwned, AlgorithmIdentifierRef};
 
 /// Generic X.509 signature structure
+///
+/// The algorithm identifier makes the most sense as a [`AlgorithmIdentifierRef`] since it inherits
+/// a relatively cheap `Copy` trait.
 #[derive(Copy, Clone, Debug)]
 pub struct Signature<'a, S>
 where
@@ -31,12 +34,12 @@ where
         Self { algorithm, data }
     }
 
-    /// Returns the AlgorithmIdentifier
+    /// Returns the algorithm identifier
     pub fn algorithm(&self) -> AlgorithmIdentifierRef<'a> {
         self.algorithm
     }
 
-    /// Returns a reference to the `ObjectIdentifier`
+    /// Returns a reference to the [`ObjectIdentifier`]
     pub fn oid(&self) -> &ObjectIdentifier {
         &self.algorithm.oid
     }
@@ -47,7 +50,7 @@ where
     }
 }
 
-/// Signature with a reference to the signature bytes
+/// [`Signature`] with a reference to the signature data
 pub type SignatureRef<'a, 'b> = Signature<'a, &'b [u8]>;
 
 impl<'a, 'b> From<&SignatureRef<'a, 'b>> for SignatureRef<'a, 'b> {
@@ -56,10 +59,11 @@ impl<'a, 'b> From<&SignatureRef<'a, 'b>> for SignatureRef<'a, 'b> {
     }
 }
 
-/// Signature which owns the signature bytes
+/// [`Signature`] which owns the signature data
 pub type SignatureOwned<'a> = Signature<'a, Vec<u8>>;
 
 impl<'a, 'b> From<&'b SignatureOwned<'a>> for SignatureRef<'a, 'b> {
+    /// Converts an owned [`Signature`] to a referenced [`Signature`]
     fn from(other: &'b SignatureOwned<'a>) -> Self {
         SignatureRef::from_ref(other.algorithm, &other.data)
     }

@@ -38,7 +38,7 @@ impl TryFrom<SubjectPublicKeyInfoRef<'_>> for DsaVerifyingKey {
     fn try_from(other: SubjectPublicKeyInfoRef<'_>) -> Result<Self, Self::Error> {
         Ok(Self {
             key: VerifyingKey::from_public_key_der(&other.to_der().or(Err(Error::Decode))?)
-                .or(Err(Error::Encode))?,
+                .or(Err(Error::InvalidKey))?,
         })
     }
 }

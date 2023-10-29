@@ -3,6 +3,7 @@
 use core::convert::Infallible;
 use der::asn1::ObjectIdentifier;
 
+/// X.509 verify error types
 #[derive(Clone, Debug)]
 pub enum Error {
     /// Verification Error

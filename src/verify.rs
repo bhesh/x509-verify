@@ -27,22 +27,22 @@ mod ed25519;
 
 /// Structure for concatenating message and signature information
 #[derive(Copy, Clone, Debug)]
-pub struct VerifyInfo<'a, B, S>
+pub struct VerifyInfo<'a, M, S>
 where
-    B: AsRef<[u8]>,
+    M: AsRef<[u8]>,
     S: AsRef<[u8]>,
 {
-    msg: Message<B>,
+    msg: Message<M>,
     sig: Signature<'a, S>,
 }
 
-impl<'a, B, S> VerifyInfo<'a, B, S>
+impl<'a, M, S> VerifyInfo<'a, M, S>
 where
-    B: AsRef<[u8]>,
+    M: AsRef<[u8]>,
     S: AsRef<[u8]>,
 {
     /// Creates the [`VerifyInfo`] given the [`Message`] and [`Signature`]
-    pub fn new(msg: Message<B>, sig: Signature<'a, S>) -> Self {
+    pub fn new(msg: Message<M>, sig: Signature<'a, S>) -> Self {
         Self { msg, sig }
     }
 
@@ -67,6 +67,14 @@ impl<'a, 'b, 'c> From<&VerifyInfoRef<'a, 'b, 'c>> for VerifyInfoRef<'a, 'b, 'c> 
 }
 
 impl<'a, 'b, 'c> From<&'c VerifyInfo<'a, Vec<u8>, &'b [u8]>> for VerifyInfoRef<'a, 'b, 'c> {
+    /// Converts the owned [`Message`] in [`VerifyInfo`] to a referenced [`Message`]
+    ///
+    /// Under normal circumstances, [`Message`] will own the encoded DER of the X.509 structure
+    /// being verified. This trait converts it to a reference which allows [`VerifyInfo`] to
+    /// inherit a relatively cheap `Copy` trait.
+    ///
+    /// On the other hand, the internal [`Signature`] is typically referenced as the signature
+    /// data itself lives in the X.509 structure.
     fn from(other: &'c VerifyInfo<'a, Vec<u8>, &'b [u8]>) -> Self {
         VerifyInfo::new(other.message().into(), other.signature().into())
     }
@@ -129,12 +137,12 @@ impl VerifyingKey {
     }
 
     /// Verifies the signature given the [`VerifyInfo`]
-    pub fn verify<'a, V, B, S>(&self, verify_info: V) -> Result<(), Error>
+    pub fn verify<'a, V, M, S>(&self, verify_info: V) -> Result<(), Error>
     where
-        V: TryInto<VerifyInfo<'a, B, S>>,
-        Error: From<V::Error>,
-        B: AsRef<[u8]>,
+        V: TryInto<VerifyInfo<'a, M, S>>,
+        M: AsRef<[u8]>,
         S: AsRef<[u8]>,
+        Error: From<V::Error>,
     {
         let verify_info = verify_info.try_into()?;
         match self {

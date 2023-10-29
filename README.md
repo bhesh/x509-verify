@@ -13,8 +13,8 @@ A pure Rust, no standard library implementation of X.509 verification. Makes use
 The goal of this crate is to provide a general means of verification for common X.509 algorithm identifiers.
 It aims to abstract away some of the verification nuances of signatures within X.509 structures. Such as:
 
-- Extracting the public key of a certificate and mapping it to the appropriate `signature::VerifyingKey`
-- Extracting the raw message of the signature and running it through the appropriate `digest::Digest` algorithm
+- Extracting the public key of a certificate and mapping it to the appropriate key container
+- Extracting the raw message of the signature and running it through the appropriate digest algorithm
 - Extracting the signature bytes and structuring them into the expected format required of the identified algorithm
 
 This crate relies heavily on external implementations of the underlying algorithms. These algorithms will all be

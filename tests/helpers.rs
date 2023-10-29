@@ -84,13 +84,13 @@ pub fn self_signed_bad_oid(filename: &str) {
     }
 }
 
-pub fn x509_verify_good<'a, K, V, B, S>(key: K, verify_info: V)
+pub fn x509_verify_good<'a, K, V, M, S>(key: K, verify_info: V)
 where
     K: TryInto<VerifyingKey>,
     K::Error: Debug,
-    V: TryInto<VerifyInfo<'a, B, S>>,
+    V: TryInto<VerifyInfo<'a, M, S>>,
     V::Error: Debug,
-    B: AsRef<[u8]>,
+    M: AsRef<[u8]>,
     S: AsRef<[u8]>,
     Error: From<K::Error> + From<V::Error>,
 {
@@ -111,7 +111,7 @@ where
         "".as_bytes().into(),
         signature.try_into().expect("error making signature"),
     );
-    match key.verify(verify_info) {
+    match key.verify(&verify_info) {
         Ok(_) => panic!("should not have been good"),
         Err(Error::Verification) => {}
         Err(e) => panic!("{:?}", e),
