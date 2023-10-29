@@ -92,7 +92,12 @@ Some of the features of this crate are in an early, experimental phase. Use at y
         .subject_public_key_info
         .try_into()
         .expect("error making key");
+
+    // Keeps ownership
     key.verify(&verify_info).expect("error verifying");
+
+    // Throws away ownership
+    key.verify(verify_info).expect("error verifying");
 }
 ```
 
@@ -106,7 +111,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
     use x509_verify::{
         x509_cert::{crl::CertificateList, Certificate},
         x509_ocsp::{BasicOcspResponse, OcspResponse, OcspResponseStatus},
-        VerifyInfo, VerifyingKey,
+        VerifyingKey,
     };
 
     // CA-signed certificate
