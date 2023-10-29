@@ -1,9 +1,9 @@
 //! EdDSA VerifyingKey
 
-use crate::{Error, X509Signature};
+use crate::{Error, Signature};
 use const_oid::AssociatedOid;
 use der::asn1::ObjectIdentifier;
-use ed25519_dalek::{Signature, VerifyingKey};
+use ed25519_dalek::{Signature as Ed25519Signature, VerifyingKey};
 use spki::SubjectPublicKeyInfoRef;
 
 // 1.3.6.1.4.1.11591.15.1 Another ed25519?
@@ -11,16 +11,16 @@ use spki::SubjectPublicKeyInfoRef;
 const ID_ED25519: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.3.101.112");
 
 #[derive(Clone, Debug)]
-pub struct X509Ed25519VerifyingKey {
+pub struct Ed25519VerifyingKey {
     key: VerifyingKey,
 }
 
-impl AssociatedOid for X509Ed25519VerifyingKey {
+impl AssociatedOid for Ed25519VerifyingKey {
     // ID_EC_PUBLIC_KEY
     const OID: ObjectIdentifier = ID_ED25519;
 }
 
-impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509Ed25519VerifyingKey {
+impl TryFrom<SubjectPublicKeyInfoRef<'_>> for Ed25519VerifyingKey {
     type Error = Error;
 
     fn try_from(other: SubjectPublicKeyInfoRef<'_>) -> Result<Self, Self::Error> {
@@ -32,12 +32,15 @@ impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509Ed25519VerifyingKey {
     }
 }
 
-impl X509Ed25519VerifyingKey {
-    pub fn verify(&self, msg: &[u8], signature: &X509Signature<'_, '_>) -> Result<(), Error> {
+impl Ed25519VerifyingKey {
+    pub fn verify<S>(&self, msg: &[u8], signature: &Signature<'_, S>) -> Result<(), Error>
+    where
+        S: AsRef<[u8]>,
+    {
         self.key
             .verify_strict(
                 msg,
-                &Signature::from_slice(signature.data()).or(Err(Error::InvalidSignature))?,
+                &Ed25519Signature::from_slice(signature.data()).or(Err(Error::InvalidSignature))?,
             )
             .or(Err(Error::Verification))
     }

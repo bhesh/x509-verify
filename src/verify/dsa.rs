@@ -1,9 +1,9 @@
 //! DSA VerifyingKey
 
-use crate::{Error, X509Signature};
+use crate::{Error, Signature};
 use const_oid::AssociatedOid;
 use der::{asn1::ObjectIdentifier, Encode};
-use dsa::{Signature, VerifyingKey};
+use dsa::{Signature as DsaSignature, VerifyingKey};
 use signature::{digest::Digest, hazmat::PrehashVerifier};
 use spki::{DecodePublicKey, SubjectPublicKeyInfoRef};
 
@@ -23,16 +23,16 @@ const DSA_WITH_SHA_224: ObjectIdentifier = ObjectIdentifier::new_unwrap("2.16.84
 const DSA_WITH_SHA_256: ObjectIdentifier = ObjectIdentifier::new_unwrap("2.16.840.1.101.3.4.3.2");
 
 #[derive(Clone, Debug)]
-pub struct X509DsaVerifyingKey {
+pub struct DsaVerifyingKey {
     key: VerifyingKey,
 }
 
-impl AssociatedOid for X509DsaVerifyingKey {
+impl AssociatedOid for DsaVerifyingKey {
     // ID_DSA
     const OID: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10040.4.1");
 }
 
-impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509DsaVerifyingKey {
+impl TryFrom<SubjectPublicKeyInfoRef<'_>> for DsaVerifyingKey {
     type Error = Error;
 
     fn try_from(other: SubjectPublicKeyInfoRef<'_>) -> Result<Self, Self::Error> {
@@ -43,9 +43,12 @@ impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509DsaVerifyingKey {
     }
 }
 
-impl X509DsaVerifyingKey {
-    pub fn verify(&self, msg: &[u8], signature: &X509Signature<'_, '_>) -> Result<(), Error> {
-        let sig = Signature::try_from(signature.data()).or(Err(Error::InvalidSignature))?;
+impl DsaVerifyingKey {
+    pub fn verify<S>(&self, msg: &[u8], signature: &Signature<'_, S>) -> Result<(), Error>
+    where
+        S: AsRef<[u8]>,
+    {
+        let sig = DsaSignature::try_from(signature.data()).or(Err(Error::InvalidSignature))?;
         match signature.oid() {
             #[cfg(feature = "sha1")]
             &DSA_WITH_SHA_1 => self

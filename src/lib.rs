@@ -15,14 +15,14 @@ extern crate alloc;
 mod error;
 pub use error::Error;
 
-pub mod message;
-pub use message::{X509Message, X509MessageOwned, X509MessageRef};
+mod message;
+pub use message::{Message, MessageOwned, MessageRef};
 
-pub mod signature;
-pub use signature::X509Signature;
+mod signature;
+pub use signature::{Signature, SignatureOwned, SignatureRef};
 
 pub mod verify;
-pub use verify::{X509VerifyInfo, X509VerifyingKey};
+pub use verify::{VerifyInfo, VerifyInfoRef, VerifyingKey};
 
 #[cfg(feature = "x509")]
 mod x509;

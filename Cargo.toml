@@ -1,8 +1,8 @@
 [package]
 name = "x509-verify"
-version = "0.3.3"
+version = "0.4.0"
 description = """
-Pure Rust library that verifies X.509 signatures based on the OIDs
+Pure Rust library that verifies X.509 signatures based on the signature algorithm identifiers
 """
 authors = ["Brian Hession"]
 license = "Apache-2.0 OR MIT"
@@ -11,7 +11,7 @@ categories = ["cryptography", "no-std"]
 keywords = ["crypto", "x509"]
 readme = "README.md"
 edition = "2021"
-rust-version = "1.73"
+rust-version = "1.65"
 
 [dependencies]
 const-oid = { version = "0.9.5", default-features = false }

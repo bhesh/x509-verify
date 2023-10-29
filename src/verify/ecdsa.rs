@@ -1,9 +1,9 @@
 //! ECDSA VerifyingKey
 
-use crate::{Error, X509Signature};
+use crate::{Error, Signature};
 use const_oid::AssociatedOid;
 use der::asn1::ObjectIdentifier;
-use ecdsa::{Signature, VerifyingKey};
+use ecdsa::{Signature as EcdsaSignature, VerifyingKey};
 use signature::{digest::Digest, hazmat::PrehashVerifier};
 use spki::SubjectPublicKeyInfoRef;
 
@@ -38,7 +38,7 @@ const ECDSA_WITH_SHA_384: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.8
 const ECDSA_WITH_SHA_512: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.4.3.4");
 
 #[derive(Clone, Debug)]
-pub enum X509EcdsaVerifyingKey {
+pub enum EcdsaVerifyingKey {
     #[cfg(feature = "k256")]
     K256(VerifyingKey<k256::Secp256k1>),
 
@@ -55,16 +55,15 @@ pub enum X509EcdsaVerifyingKey {
     P384(VerifyingKey<p384::NistP384>),
 }
 
-impl X509EcdsaVerifyingKey {
-    fn verify_prehash(
-        &self,
-        prehash: &[u8],
-        signature: &X509Signature<'_, '_>,
-    ) -> Result<(), Error> {
+impl EcdsaVerifyingKey {
+    fn verify_prehash<S>(&self, prehash: &[u8], signature: &Signature<'_, S>) -> Result<(), Error>
+    where
+        S: AsRef<[u8]>,
+    {
         match &self {
             #[cfg(feature = "k256")]
             Self::K256(pk) => {
-                let sig = Signature::<k256::Secp256k1>::from_der(signature.data())
+                let sig = EcdsaSignature::<k256::Secp256k1>::from_der(signature.data())
                     .or(Err(Error::InvalidSignature))?;
                 pk.verify_prehash(prehash, &sig)
                     .or(Err(Error::Verification))
@@ -72,7 +71,7 @@ impl X509EcdsaVerifyingKey {
 
             #[cfg(feature = "p192")]
             Self::P192(pk) => {
-                let sig = Signature::<p192::NistP192>::from_der(signature.data())
+                let sig = EcdsaSignature::<p192::NistP192>::from_der(signature.data())
                     .or(Err(Error::InvalidSignature))?;
                 pk.verify_prehash(prehash, &sig)
                     .or(Err(Error::Verification))
@@ -80,7 +79,7 @@ impl X509EcdsaVerifyingKey {
 
             #[cfg(feature = "p224")]
             Self::P224(pk) => {
-                let sig = Signature::<p224::NistP224>::from_der(signature.data())
+                let sig = EcdsaSignature::<p224::NistP224>::from_der(signature.data())
                     .or(Err(Error::InvalidSignature))?;
                 pk.verify_prehash(prehash, &sig)
                     .or(Err(Error::Verification))
@@ -88,7 +87,7 @@ impl X509EcdsaVerifyingKey {
 
             #[cfg(feature = "p256")]
             Self::P256(pk) => {
-                let sig = Signature::<p256::NistP256>::from_der(signature.data())
+                let sig = EcdsaSignature::<p256::NistP256>::from_der(signature.data())
                     .or(Err(Error::InvalidSignature))?;
                 pk.verify_prehash(prehash, &sig)
                     .or(Err(Error::Verification))
@@ -96,7 +95,7 @@ impl X509EcdsaVerifyingKey {
 
             #[cfg(feature = "p384")]
             Self::P384(pk) => {
-                let sig = Signature::<p384::NistP384>::from_der(signature.data())
+                let sig = EcdsaSignature::<p384::NistP384>::from_der(signature.data())
                     .or(Err(Error::InvalidSignature))?;
                 pk.verify_prehash(prehash, &sig)
                     .or(Err(Error::Verification))
@@ -105,12 +104,12 @@ impl X509EcdsaVerifyingKey {
     }
 }
 
-impl AssociatedOid for X509EcdsaVerifyingKey {
+impl AssociatedOid for EcdsaVerifyingKey {
     // ID_EC_PUBLIC_KEY
     const OID: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.2.1");
 }
 
-impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509EcdsaVerifyingKey {
+impl TryFrom<SubjectPublicKeyInfoRef<'_>> for EcdsaVerifyingKey {
     type Error = Error;
 
     fn try_from(other: SubjectPublicKeyInfoRef<'_>) -> Result<Self, Self::Error> {
@@ -159,8 +158,11 @@ impl TryFrom<SubjectPublicKeyInfoRef<'_>> for X509EcdsaVerifyingKey {
     }
 }
 
-impl X509EcdsaVerifyingKey {
-    pub fn verify(&self, msg: &[u8], signature: &X509Signature<'_, '_>) -> Result<(), Error> {
+impl EcdsaVerifyingKey {
+    pub fn verify<S>(&self, msg: &[u8], signature: &Signature<'_, S>) -> Result<(), Error>
+    where
+        S: AsRef<[u8]>,
+    {
         match signature.oid() {
             #[cfg(feature = "sha2")]
             &ECDSA_WITH_SHA_224 => self.verify_prehash(&Sha224::digest(msg), signature),
