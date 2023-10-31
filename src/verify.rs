@@ -83,12 +83,15 @@ impl<'a, 'b, 'c> From<&'c VerifyInfo<'a, Vec<u8>, &'b [u8]>> for VerifyInfoRef<'
 /// Structure used to verify a signature
 #[derive(Clone, Debug)]
 pub enum VerifyingKey {
+    /// DSA Keys
     #[cfg(feature = "dsa")]
     Dsa(self::dsa::DsaVerifyingKey),
 
+    /// RSA Keys
     #[cfg(feature = "rsa")]
     Rsa(self::rsa::RsaVerifyingKey),
 
+    /// ECDSA Keys
     #[cfg(any(
         feature = "k256",
         feature = "p192",
@@ -98,6 +101,7 @@ pub enum VerifyingKey {
     ))]
     Ecdsa(self::ecdsa::EcdsaVerifyingKey),
 
+    /// ED25519 Keys
     #[cfg(feature = "ed25519")]
     Ed25519(self::ed25519::Ed25519VerifyingKey),
 }
