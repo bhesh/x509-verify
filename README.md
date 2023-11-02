@@ -1,4 +1,4 @@
-x509-verify [![](https://github.com/bhesh/x509-verify/actions/workflows/all.yml/badge.svg?branch=master)](https://github.com/bhesh/x509-verify/actions/workflows/all.yml)
+x509-verify [![](https://img.shields.io/crates/v/x509-verify.svg)](https://crates.io/crates/x509-verify) [![](https://docs.rs/x509-verify/badge.svg)](https://docs.rs/x509-verify) [![](https://github.com/bhesh/x509-verify/actions/workflows/all.yml/badge.svg?branch=master)](https://github.com/bhesh/x509-verify/actions/workflows/all.yml)
 ===========
 
 A pure Rust, no standard library implementation of X.509 verification. Makes use of
