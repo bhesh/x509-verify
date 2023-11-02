@@ -1,4 +1,4 @@
-name: ECDSA-with-SHA2
+name: ECDSA features
 
 on:
   push:

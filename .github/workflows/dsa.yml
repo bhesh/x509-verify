@@ -1,4 +1,4 @@
-name: DSA-with-SHA1
+name: DSA feature
 
 on:
   push:

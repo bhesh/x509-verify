@@ -1,4 +1,4 @@
-name: RSA-with-SHA1-SHA2
+name: RSA feature
 
 on:
   push:

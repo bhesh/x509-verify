@@ -1,4 +1,4 @@
-name: Ed25519
+name: Ed25519 feature
 
 on:
   push:
