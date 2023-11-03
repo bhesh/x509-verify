@@ -4,8 +4,10 @@ use crate::{Error, Signature};
 use const_oid::AssociatedOid;
 use der::{asn1::ObjectIdentifier, Encode};
 use dsa::{Signature as DsaSignature, VerifyingKey};
-use signature::{digest::Digest, hazmat::PrehashVerifier};
 use spki::{DecodePublicKey, SubjectPublicKeyInfoRef};
+
+#[cfg(any(feature = "sha1", feature = "sha2"))]
+use signature::{digest::Digest, hazmat::PrehashVerifier};
 
 #[cfg(feature = "sha1")]
 use sha1::Sha1;
@@ -22,6 +24,7 @@ const DSA_WITH_SHA_224: ObjectIdentifier = ObjectIdentifier::new_unwrap("2.16.84
 #[cfg(feature = "sha2")]
 const DSA_WITH_SHA_256: ObjectIdentifier = ObjectIdentifier::new_unwrap("2.16.840.1.101.3.4.3.2");
 
+#[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub struct DsaVerifyingKey {
     key: VerifyingKey,
@@ -44,6 +47,7 @@ impl TryFrom<SubjectPublicKeyInfoRef<'_>> for DsaVerifyingKey {
 }
 
 impl DsaVerifyingKey {
+    #[allow(unused_variables)]
     pub fn verify<S>(&self, msg: &[u8], signature: &Signature<'_, S>) -> Result<(), Error>
     where
         S: AsRef<[u8]>,
