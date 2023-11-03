@@ -28,7 +28,7 @@ jobs:
           toolchain: ${{ matrix.rust }}
           targets: ${{ matrix.target }}
       - uses: taiki-e/install-action@cargo-hack
-      - run: cargo hack build --target ${{ matrix.target }} --feature-powerset --skip x509-cert
+      - run: cargo hack build --target ${{ matrix.target }} --feature-powersets --optional-deps md2,sha1,sha2,rsa,dsa,ecdsa,k256,p192,p224,p256,p384
 
   test:
     strategy:
@@ -43,4 +43,4 @@ jobs:
         with:
           toolchain: ${{ matrix.rust }}
       - uses: taiki-e/install-action@cargo-hack
-      - run: cargo hack test --feature-powerset --feature-powerset --skip x509-cert
+      - run: cargo hack test --feature-powersets --optional-deps md2,sha1,sha2,rsa,dsa,ecdsa,k256,p192,p224,p256,p384
