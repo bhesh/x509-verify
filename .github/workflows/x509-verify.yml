@@ -2,41 +2,46 @@ name: x509-verify
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "**" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "**" ]
 
 env:
   CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-Dwarnings"
 
 jobs:
   build:
-
+    strategy:
+      matrix:
+        rust:
+          - 1.65.0
+          - stable
+        target:
+          - thumbv7em-none-eabi
+          - wasm32-unknown-unknown
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Build default features
-      run: cargo build --verbose
-    - name: Test default features
-      run: cargo test --verbose
-    - name: Build rsa/sha1/sha2 features
-      run: cargo build --no-default-features --features rsa,sha1,sha2 --verbose
-    - name: Test rsa/sha1/sha2 features
-      run: cargo test --no-default-features --features rsa,sha1,sha2 --verbose
-    - name: Build dsa/sha1 features
-      run: cargo build --no-default-features --features dsa,sha1 --verbose
-    - name: Test dsa/sha1 features
-      run: cargo test --no-default-features --features dsa,sha1 --verbose
-    - name: Build ecdsa/sha2 features
-      run: cargo build --no-default-features --features ecdsa,sha2 --verbose
-    - name: Test ecdsa/sha2 features
-      run: cargo test --no-default-features --features ecdsa,sha2 --verbose
-    - name: Build ed25519/sha2 features
-      run: cargo build --no-default-features --features ed25519,sha2 --verbose
-    - name: Test ed25519/sha2 features
-      run: cargo test --no-default-features --features ed25519,sha2 --verbose
-    - name: Build all features
-      run: cargo build --all-features --verbose
-    - name: Test all features
-      run: cargo test --all-features --verbose
+      - uses: actions/checkout@v3
+      - runs: ${{ matrix.deps }}
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+          targets: ${{ matrix.target }}
+      - uses: RustCrypto/actions/cross-install@master
+      - run: cargo hack build --target ${{ matrix.target }} --feature-powerset
+
+  test:
+    strategy:
+      matrix:
+        rust:
+          - 1.65.0
+          - stable
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+      - uses: RustCrypto/actions/cargo-hack-install@master
+      - run: cargo hack test --feature-powerset
