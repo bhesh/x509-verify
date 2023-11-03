@@ -25,6 +25,8 @@ pub use signature::{Signature, SignatureOwned, SignatureRef};
 mod verify;
 pub use verify::{VerifyInfo, VerifyInfoRef, VerifyingKey};
 
+pub use spki;
+
 #[cfg(feature = "x509")]
 mod x509;
 

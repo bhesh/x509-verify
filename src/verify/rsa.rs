@@ -10,7 +10,7 @@ use spki::{DecodePublicKey, SubjectPublicKeyInfoRef};
 use rsa::Pkcs1v15Sign;
 
 #[cfg(any(feature = "sha1", feature = "sha2"))]
-use signature::digest::Digest;
+use ::signature::digest::Digest;
 
 #[cfg(feature = "md2")]
 use md2::Md2;

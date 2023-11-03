@@ -7,7 +7,7 @@ use dsa::{Signature as DsaSignature, VerifyingKey};
 use spki::{DecodePublicKey, SubjectPublicKeyInfoRef};
 
 #[cfg(any(feature = "sha1", feature = "sha2"))]
-use signature::{digest::Digest, hazmat::PrehashVerifier};
+use ::signature::{digest::Digest, hazmat::PrehashVerifier};
 
 #[cfg(feature = "sha1")]
 use sha1::Sha1;

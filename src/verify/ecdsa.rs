@@ -4,8 +4,10 @@ use crate::{Error, Signature};
 use const_oid::AssociatedOid;
 use der::asn1::ObjectIdentifier;
 use ecdsa::{Signature as EcdsaSignature, VerifyingKey};
-use signature::{digest::Digest, hazmat::PrehashVerifier};
 use spki::SubjectPublicKeyInfoRef;
+
+#[cfg(feature = "sha2")]
+use ::signature::{digest::Digest, hazmat::PrehashVerifier};
 
 #[cfg(feature = "k256")]
 const SECP_256_K_1: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.3.132.0.10");
