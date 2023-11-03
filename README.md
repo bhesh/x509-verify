@@ -1,4 +1,4 @@
-x509-verify [![](https://img.shields.io/crates/v/x509-verify.svg)](https://crates.io/crates/x509-verify) [![](https://docs.rs/x509-verify/badge.svg)](https://docs.rs/x509-verify) [![](https://github.com/bhesh/x509-verify/actions/workflows/all.yml/badge.svg?branch=master)](https://github.com/bhesh/x509-verify/actions/workflows/all.yml)
+x509-verify [![](https://img.shields.io/crates/v/x509-verify.svg)](https://crates.io/crates/x509-verify) [![](https://docs.rs/x509-verify/badge.svg)](https://docs.rs/x509-verify) [![](https://github.com/bhesh/x509-verify/actions/workflows/x509-verify.yml/badge.svg?branch=master)](https://github.com/bhesh/x509-verify/actions/workflows/x509-verify.yml)
 ===========
 
 A pure Rust, no standard library implementation of X.509 verification. Makes use of
@@ -26,17 +26,17 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 
 ## Currently supported
 
-### DSA [![](https://github.com/bhesh/x509-verify/actions/workflows/dsa.yml/badge.svg?branch=master)](https://github.com/bhesh/x509-verify/actions/workflows/dsa.yml)
+### DSA
 
 - `DSA_WITH_SHA_1`
 - `DSA_WITH_SHA_224`
 - `DSA_WITH_SHA_256`
 
-### EdDSA [![](https://github.com/bhesh/x509-verify/actions/workflows/ed25519.yml/badge.svg?branch=master)](https://github.com/bhesh/x509-verify/actions/workflows/ed25519.yml)
+### EdDSA
 
 - `ED25519`
 
-### RSA [![](https://github.com/bhesh/x509-verify/actions/workflows/rsa.yml/badge.svg?branch=master)](https://github.com/bhesh/x509-verify/actions/workflows/rsa.yml)
+### RSA
 
 - `MD_2_WITH_RSA_ENCRYPTION`
 - `MD_5_WITH_RSA_ENCRYPTION`
@@ -46,7 +46,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 - `SHA_384_WITH_RSA_ENCRYPTION`
 - `SHA_512_WITH_RSA_ENCRYPTION`
 
-### ECDSA [![](https://github.com/bhesh/x509-verify/actions/workflows/ecdsa.yml/badge.svg?branch=master)](https://github.com/bhesh/x509-verify/actions/workflows/ecdsa.yml)
+### ECDSA
 
 - `ECDSA_WITH_SHA_224`
 - `ECDSA_WITH_SHA_256`
