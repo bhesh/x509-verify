@@ -3,9 +3,14 @@
 use crate::{Error, Signature};
 use const_oid::AssociatedOid;
 use der::{asn1::ObjectIdentifier, Encode};
-use rsa::{Pkcs1v15Sign, RsaPublicKey};
-use signature::digest::Digest;
+use rsa::RsaPublicKey;
 use spki::{DecodePublicKey, SubjectPublicKeyInfoRef};
+
+#[cfg(any(feature = "md2", feature = "md5", feature = "sha1", feature = "sha2"))]
+use rsa::Pkcs1v15Sign;
+
+#[cfg(any(feature = "sha1", feature = "sha2"))]
+use signature::digest::Digest;
 
 #[cfg(feature = "md2")]
 use md2::Md2;
@@ -47,6 +52,7 @@ const SHA_384_WITH_RSA_ENCRYPTION: ObjectIdentifier =
 const SHA_512_WITH_RSA_ENCRYPTION: ObjectIdentifier =
     ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.13");
 
+#[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub struct RsaVerifyingKey {
     key: RsaPublicKey,
@@ -69,6 +75,7 @@ impl TryFrom<SubjectPublicKeyInfoRef<'_>> for RsaVerifyingKey {
 }
 
 impl RsaVerifyingKey {
+    #[allow(unused_variables)]
     pub fn verify<S>(&self, msg: &[u8], signature: &Signature<'_, S>) -> Result<(), Error>
     where
         S: AsRef<[u8]>,

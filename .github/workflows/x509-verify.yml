@@ -20,18 +20,6 @@ jobs:
         target:
           - thumbv7em-none-eabi
           - wasm32-unknown-unknown
-        features:
-          - dsa,sha1
-          - rsa,sha1,sha2
-          - k256,sha2
-          - p192,sha2
-          - p224,sha2
-          - p256,sha2
-          - p384,sha2
-          - ecdsa,sha2
-          - ed25519,sha2
-          - md2,md5,sha1,sha2,dsa,rsa,ecdsa,ed25519
-          - md2,md5,sha1,sha2,dsa,rsa,ecdsa,ed25519,x509,pem
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -39,7 +27,17 @@ jobs:
         with:
           toolchain: ${{ matrix.rust }}
           targets: ${{ matrix.target }}
-      - run: cargo build --target ${{ matrix.target }} --no-default-features --features ${{ matrix.features }}
+      - run: cargo build --target ${{ matrix.target }} --no-default-features --features dsa,sha1
+      - run: cargo build --target ${{ matrix.target }} --no-default-features --features rsa,sha1,sha2
+      - run: cargo build --target ${{ matrix.target }} --no-default-features --features k256,sha2
+      - run: cargo build --target ${{ matrix.target }} --no-default-features --features p192,sha2
+      - run: cargo build --target ${{ matrix.target }} --no-default-features --features p224,sha2
+      - run: cargo build --target ${{ matrix.target }} --no-default-features --features p256,sha2
+      - run: cargo build --target ${{ matrix.target }} --no-default-features --features p384,sha2
+      - run: cargo build --target ${{ matrix.target }} --no-default-features --features ecdsa,sha2
+      - run: cargo build --target ${{ matrix.target }} --no-default-features --features ed25519,sha2
+      - run: cargo build --target ${{ matrix.target }} --no-default-features --features md2,md5,sha1,sha2,dsa,rsa,ecdsa,ed25519
+      - run: cargo build --target ${{ matrix.target }} --no-default-features --features md2,md5,sha1,sha2,dsa,rsa,ecdsa,ed25519,x509,pem
 
   test:
     strategy:
@@ -47,22 +45,20 @@ jobs:
         rust:
           - 1.65.0
           - stable
-        features:
-          - dsa,sha1
-          - rsa,sha1,sha2
-          - k256,sha2
-          - p192,sha2
-          - p224,sha2
-          - p256,sha2
-          - p384,sha2
-          - ecdsa,sha2
-          - ed25519,sha2
-          - md2,md5,sha1,sha2,dsa,rsa,ecdsa,ed25519
-          - md2,md5,sha1,sha2,dsa,rsa,ecdsa,ed25519,x509,pem
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.rust }}
-      - run: cargo test --no-default-features --features ${{ matrix.features }}
+      - run: cargo test --no-default-features --features dsa,sha1
+      - run: cargo test --no-default-features --features rsa,sha1,sha2
+      - run: cargo test --no-default-features --features k256,sha2
+      - run: cargo test --no-default-features --features p192,sha2
+      - run: cargo test --no-default-features --features p224,sha2
+      - run: cargo test --no-default-features --features p256,sha2
+      - run: cargo test --no-default-features --features p384,sha2
+      - run: cargo test --no-default-features --features ecdsa,sha2
+      - run: cargo test --no-default-features --features ed25519,sha2
+      - run: cargo test --no-default-features --features md2,md5,sha1,sha2,dsa,rsa,ecdsa,ed25519
+      - run: cargo test --no-default-features --features md2,md5,sha1,sha2,dsa,rsa,ecdsa,ed25519,x509,pem
