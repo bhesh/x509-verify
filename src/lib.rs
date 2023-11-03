@@ -20,11 +20,12 @@ mod message;
 pub use message::{Message, MessageOwned, MessageRef};
 
 mod signature;
-pub use signature::{Signature, SignatureOwned, SignatureRef};
+pub use crate::signature::{Signature, SignatureOwned, SignatureRef};
 
 mod verify;
 pub use verify::{VerifyInfo, VerifyInfoRef, VerifyingKey};
 
+pub use der;
 pub use spki;
 
 #[cfg(feature = "x509")]
