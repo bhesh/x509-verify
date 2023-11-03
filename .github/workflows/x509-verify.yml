@@ -27,8 +27,8 @@ jobs:
         with:
           toolchain: ${{ matrix.rust }}
           targets: ${{ matrix.target }}
-      - uses: RustCrypto/actions/cargo-hack-install@master
-      - run: cargo hack build --target ${{ matrix.target }} --feature-powerset --exclude-features ed25519-dalek,x509-cert,ocsp-x509
+      - uses: taiki-e/install-action@cargo-hack
+      - run: cargo hack build --target ${{ matrix.target }} --feature-powerset --ignore-unknown-features
 
   test:
     strategy:
@@ -42,5 +42,5 @@ jobs:
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.rust }}
-      - uses: RustCrypto/actions/cargo-hack-install@master
-      - run: cargo hack test --feature-powerset --exclude-features ed25519-dalek,x509-cert,ocsp-x509
+      - uses: taiki-e/install-action@cargo-hack
+      - run: cargo hack test --feature-powerset --ignore-unknown-features
