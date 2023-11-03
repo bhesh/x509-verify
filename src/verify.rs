@@ -2,10 +2,21 @@
 
 use crate::{Error, Message, Signature};
 use alloc::vec::Vec;
-use const_oid::AssociatedOid;
 use core::result::Result;
 use der::referenced::OwnedToRef;
 use spki::{SubjectPublicKeyInfoOwned, SubjectPublicKeyInfoRef};
+
+#[cfg(any(
+    feature = "dsa",
+    feature = "rsa",
+    feature = "k256",
+    feature = "p192",
+    feature = "p224",
+    feature = "p256",
+    feature = "p384",
+    feature = "ed25519"
+))]
+use const_oid::AssociatedOid;
 
 #[cfg(feature = "dsa")]
 mod dsa;
@@ -104,6 +115,19 @@ pub enum VerifyingKey {
     /// ED25519 Keys
     #[cfg(feature = "ed25519")]
     Ed25519(self::ed25519::Ed25519VerifyingKey),
+
+    /// No usable features...
+    #[cfg(not(any(
+        feature = "dsa",
+        feature = "rsa",
+        feature = "k256",
+        feature = "p192",
+        feature = "p224",
+        feature = "p256",
+        feature = "p384",
+        feature = "ed25519"
+    )))]
+    Fail,
 }
 
 impl VerifyingKey {
@@ -141,6 +165,7 @@ impl VerifyingKey {
     }
 
     /// Verifies the signature given the [`VerifyInfo`]
+    #[allow(unused_variables)]
     pub fn verify<'a, V, M, S>(&self, verify_info: V) -> Result<(), Error>
     where
         V: TryInto<VerifyInfo<'a, M, S>>,
@@ -167,6 +192,18 @@ impl VerifyingKey {
 
             #[cfg(feature = "ed25519")]
             VerifyingKey::Ed25519(k) => k.verify(verify_info.message(), verify_info.signature()),
+
+            #[cfg(not(any(
+                feature = "dsa",
+                feature = "rsa",
+                feature = "k256",
+                feature = "p192",
+                feature = "p224",
+                feature = "p256",
+                feature = "p384",
+                feature = "ed25519"
+            )))]
+            VerifyingKey::Fail => unreachable!(),
         }
     }
 }
