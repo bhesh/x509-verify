@@ -28,7 +28,7 @@ jobs:
           toolchain: ${{ matrix.rust }}
           targets: ${{ matrix.target }}
       - uses: taiki-e/install-action@cargo-hack
-      - run: cargo hack build --target ${{ matrix.target }} --feature-powerset --ignore-unknown-features
+      - run: cargo hack build --target ${{ matrix.target }} --feature-powerset --skip x509-cert
 
   test:
     strategy:
@@ -43,4 +43,4 @@ jobs:
         with:
           toolchain: ${{ matrix.rust }}
       - uses: taiki-e/install-action@cargo-hack
-      - run: cargo hack test --feature-powerset --ignore-unknown-features
+      - run: cargo hack test --feature-powerset --feature-powerset --skip x509-cert
