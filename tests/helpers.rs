@@ -89,10 +89,10 @@ where
     K: TryInto<VerifyingKey>,
     K::Error: Debug,
     V: TryInto<VerifyInfo<'a, M, S>>,
-    V::Error: Debug,
+    V::Error: Debug + Into<Error>,
     M: AsRef<[u8]>,
     S: AsRef<[u8]>,
-    Error: From<K::Error> + From<V::Error>,
+    Error: From<K::Error>,
 {
     let key: VerifyingKey = key.try_into().expect("error making key");
     key.verify(verify_info).expect("error verifying");
