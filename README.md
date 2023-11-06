@@ -175,7 +175,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 | p192 | | secp192r1 ECDSA signatures |
 | p224 | | secp224r1 ECDSA signatures |
 | p256 | ✔️ | secp256r1 ECDSA signatures |
-| p384 | ✔️ | secp284r1 ECDSA signatures |
+| p384 | ✔️ | secp384r1 ECDSA signatures |
 | ecdsa | | k256, p192, p224, p256, and p384 |
 | ed25519 | ✔️ | Ed25519 signatures |
 | x509 | | enables X.509 structure conversion |
