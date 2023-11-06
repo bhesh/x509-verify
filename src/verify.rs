@@ -169,17 +169,21 @@ impl VerifyingKey {
     pub fn verify<'a, V, M, S>(&self, verify_info: V) -> Result<(), Error>
     where
         V: TryInto<VerifyInfo<'a, M, S>>,
+        V::Error: Into<Error>,
         M: AsRef<[u8]>,
         S: AsRef<[u8]>,
-        Error: From<V::Error>,
     {
-        let verify_info = verify_info.try_into()?;
+        let verify_info = verify_info.try_into().map_err(|e| e.into())?;
         match self {
             #[cfg(feature = "dsa")]
-            VerifyingKey::Dsa(k) => k.verify(verify_info.message(), verify_info.signature()),
+            VerifyingKey::Dsa(k) => k
+                .verify(verify_info.message(), verify_info.signature())
+                .map_err(|e| e.into()),
 
             #[cfg(feature = "rsa")]
-            VerifyingKey::Rsa(k) => k.verify(verify_info.message(), verify_info.signature()),
+            VerifyingKey::Rsa(k) => k
+                .verify(verify_info.message(), verify_info.signature())
+                .map_err(|e| e.into()),
 
             #[cfg(any(
                 feature = "k256",
@@ -188,10 +192,14 @@ impl VerifyingKey {
                 feature = "p256",
                 feature = "p384"
             ))]
-            VerifyingKey::Ecdsa(k) => k.verify(verify_info.message(), verify_info.signature()),
+            VerifyingKey::Ecdsa(k) => k
+                .verify(verify_info.message(), verify_info.signature())
+                .map_err(|e| e.into()),
 
             #[cfg(feature = "ed25519")]
-            VerifyingKey::Ed25519(k) => k.verify(verify_info.message(), verify_info.signature()),
+            VerifyingKey::Ed25519(k) => k
+                .verify(verify_info.message(), verify_info.signature())
+                .map_err(|e| e.into()),
 
             #[cfg(not(any(
                 feature = "dsa",
