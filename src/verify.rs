@@ -165,7 +165,7 @@ impl VerifyingKey {
     }
 
     /// Verifies the signature given the [`VerifyInfo`]
-    #[allow(unused_variables)]
+    #[allow(unused_variables, clippy::useless_conversion)]
     pub fn verify<'a, V, M, S>(&self, verify_info: V) -> Result<(), Error>
     where
         V: TryInto<VerifyInfo<'a, M, S>>,
