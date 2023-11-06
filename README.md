@@ -146,7 +146,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
     let mut f = fs::File::open("testdata/ocsp-amazon-resp.der").expect("error opening file");
     let mut data = Vec::new();
     f.read_to_end(&mut data).expect("error reading file");
-    let res = OcspResponse::from_der(&data).expect("error decoding OcspRequest");
+    let res = OcspResponse::from_der(&data).expect("error decoding OCSP response");
     assert_eq!(res.response_status, OcspResponseStatus::Successful);
     let res = BasicOcspResponse::from_der(
         res.response_bytes
