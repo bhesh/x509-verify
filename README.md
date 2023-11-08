@@ -72,18 +72,19 @@ Some of the features of this crate are in an early, experimental phase. Use at y
     use x509_verify::{Signature, VerifyInfo, VerifyingKey};
 
     // Self-signed certificate
-    let pem = fs::read_to_string("testdata/rsa2048-sha256-crt.pem").expect("error reading file");
-    let cert = Certificate::from_pem(&pem).expect("error formatting signing cert");
+    let cert = fs::read_to_string("testdata/rsa2048-sha256-crt.pem").unwrap();
+    let cert = Certificate::from_pem(&cert).unwrap();
 
     let verify_info = VerifyInfo::new(
         cert.tbs_certificate
             .to_der()
-            .expect("error encoding message").into(),
+            .unwrap()
+            .into(),
         Signature::new(
             &cert.signature_algorithm,
             cert.signature
                 .as_bytes()
-                .expect("signature is not octet-aligned"),
+                .unwrap(),
         ),
     );
 
@@ -91,13 +92,13 @@ Some of the features of this crate are in an early, experimental phase. Use at y
         .tbs_certificate
         .subject_public_key_info
         .try_into()
-        .expect("error making key");
+        .unwrap();
 
     // Keeps ownership
-    key.verify(&verify_info).expect("error verifying");
+    key.verify(&verify_info).unwrap();
 
     // Throws away ownership
-    key.verify(verify_info).expect("error verifying");
+    key.verify(verify_info).unwrap();
 }
 ```
 
@@ -116,48 +117,44 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 
     // CA-signed certificate
 
-    let pem = fs::read_to_string("testdata/digicert-ca.pem").expect("error reading file");
-    let ca = Certificate::from_pem(&pem).expect("error decoding signing cert");
+    let ca = fs::read_to_string("testdata/digicert-ca.pem").unwrap();
+    let ca = Certificate::from_pem(&ca).unwrap();
 
-    let pem = fs::read_to_string("testdata/amazon-crt.pem").expect("error reading file");
-    let cert = Certificate::from_pem(&pem).expect("error decoding signing cert");
+    let cert = fs::read_to_string("testdata/amazon-crt.pem").unwrap();
+    let cert = Certificate::from_pem(&cert).unwrap();
 
-    let key = VerifyingKey::try_from(&ca).expect("error making key");
-    key.verify(&cert).expect("error verifying");
+    let key = VerifyingKey::try_from(&ca).unwrap();
+    key.verify(&cert).unwrap();
 
     // CA-signed CRL
 
-    let pem = fs::read_to_string("testdata/GoodCACert.pem").expect("error reading file");
-    let ca = Certificate::from_pem(&pem).expect("error decoding signing cert");
+    let ca = fs::read_to_string("testdata/GoodCACert.pem").unwrap();
+    let ca = Certificate::from_pem(&ca).unwrap();
 
-    let mut f = fs::File::open("testdata/GoodCACRL.crl").expect("error opening file");
-    let mut data = Vec::new();
-    f.read_to_end(&mut data).expect("error reading file");
-    let crl = CertificateList::from_der(&data).expect("error decoding CRL");
+    let crl = fs::read("testdata/GoodCACRL.crl").unwrap();
+    let crl = CertificateList::from_der(&crl).unwrap();
 
-    let key = VerifyingKey::try_from(&ca).expect("error making key");
-    key.verify(&crl).expect("error verifying");
+    let key = VerifyingKey::try_from(&ca).unwrap();
+    key.verify(&crl).unwrap();
 
     // CA-signed OCSP response
 
-    let pem = fs::read_to_string("testdata/digicert-ca.pem").expect("error reading file");
-    let ca = Certificate::from_pem(&pem).expect("error decoding signing cert");
+    let ca = fs::read_to_string("testdata/digicert-ca.pem").unwrap();
+    let ca = Certificate::from_pem(&ca).unwrap();
 
-    let mut f = fs::File::open("testdata/ocsp-amazon-resp.der").expect("error opening file");
-    let mut data = Vec::new();
-    f.read_to_end(&mut data).expect("error reading file");
-    let res = OcspResponse::from_der(&data).expect("error decoding OCSP response");
+    let res = fs::read("testdata/ocsp-amazon-resp.der").unwrap();
+    let res = OcspResponse::from_der(&res).unwrap();
     assert_eq!(res.response_status, OcspResponseStatus::Successful);
     let res = BasicOcspResponse::from_der(
         res.response_bytes
-            .expect("no response data")
+            .unwrap()
             .response
             .as_bytes(),
     )
-    .expect("error decoding BasicOcspResponse");
+    .unwrap();
 
-    let key = VerifyingKey::try_from(&ca).expect("error making key");
-    key.verify(&res).expect("error verifying");
+    let key = VerifyingKey::try_from(&ca).unwrap();
+    key.verify(&res).unwrap();
 }
 ```
 
