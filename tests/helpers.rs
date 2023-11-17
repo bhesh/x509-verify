@@ -7,10 +7,8 @@ use x509_verify::{Error, Signature, SignatureRef, VerifyInfo, VerifyingKey};
 #[macro_export]
 macro_rules! read_der {
     ($into:ty, $file:tt) => {{
-        let mut f = std::fs::File::open($file).expect("error opening file");
-        let mut data = Vec::new();
-        f.read_to_end(&mut data).expect("error reading file");
-        <$into>::from_der(&data).expect("error formatting der")
+        <$into>::from_der(&std::fs::read($file).expect("error reading file"))
+            .expect("error formatting der")
     }};
 }
 
