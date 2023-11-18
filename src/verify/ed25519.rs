@@ -4,6 +4,7 @@ use crate::{Error, Signature};
 use const_oid::AssociatedOid;
 use der::asn1::ObjectIdentifier;
 use ed25519_dalek::{Signature as Ed25519Signature, VerifyingKey};
+use signature::Verifier;
 use spki::SubjectPublicKeyInfoRef;
 
 // 1.3.6.1.4.1.11591.15.1 Another ed25519?
@@ -38,7 +39,7 @@ impl Ed25519VerifyingKey {
         S: AsRef<[u8]>,
     {
         self.key
-            .verify_strict(
+            .verify(
                 msg,
                 &Ed25519Signature::from_slice(signature.data()).or(Err(Error::InvalidSignature))?,
             )
