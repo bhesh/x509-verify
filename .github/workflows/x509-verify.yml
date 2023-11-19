@@ -30,6 +30,7 @@ jobs:
       - run: cargo build --target ${{ matrix.target }} --no-default-features --features dsa,sha1
       - run: cargo build --target ${{ matrix.target }} --no-default-features --features rsa,sha1,sha2
       - run: cargo build --target ${{ matrix.target }} --no-default-features --features k256,sha2
+      - run: cargo build --target ${{ matrix.target }} --no-default-features --features k256,sha2,strict
       - run: cargo build --target ${{ matrix.target }} --no-default-features --features p192,sha2
       - run: cargo build --target ${{ matrix.target }} --no-default-features --features p224,sha2
       - run: cargo build --target ${{ matrix.target }} --no-default-features --features p256,sha2
