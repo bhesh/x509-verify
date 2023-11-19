@@ -102,9 +102,11 @@ impl<'a> From<&'a VerifyInfo<'a, &'a [u8], Vec<u8>>> for VerifyInfoRef<'a, 'a, '
     ///
     /// Lifetimes should be:
     ///
+    /// ```text
     /// 'a: self.sig.algorithm<'a>    (AlgorithmIdentifierRef<'a>)
     /// 'b: self.msg.0<'b>            (Borrowed &'b [u8])
     /// 'c: &'c self.sig.data<owned>  (Owned Vec<u8>)
+    /// ```
     ///
     /// If `'a` goes out of scope, it takes `'c` with it (and vice-versa). But `'b` _may_ be able
     /// to go out of scope depending on how the Rust borrow checker handles it. Use with caution.
