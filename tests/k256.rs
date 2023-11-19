@@ -5,17 +5,36 @@ use helpers::*;
 #[cfg(feature = "k256")]
 mod k256_tests {
     use crate::{helpers::*, *};
-
-    #[cfg(feature = "x509")]
-    use der::DecodePem;
-
-    #[cfg(feature = "x509")]
+    use der::{Decode, DecodePem, Encode};
     use x509_cert::Certificate;
+    use x509_verify::{Error, Signature, VerifyInfo, VerifyingKey};
 
     #[cfg(feature = "sha2")]
     #[test]
-    fn k256_with_sha256_good() {
-        self_signed_good("testdata/secp256k1-sha256-crt.pem");
+    fn k256_with_sha256_good_if_not_strict() {
+        let cert = read_pem!(Certificate, "testdata/secp256k1-sha256-crt.pem");
+        let msg = cert
+            .tbs_certificate
+            .to_der()
+            .expect("error encoding message");
+        let sig = Signature::new(
+            &cert.signature_algorithm,
+            cert.signature
+                .as_bytes()
+                .expect("signature is not octet-aligned"),
+        );
+        let key: VerifyingKey = cert
+            .tbs_certificate
+            .subject_public_key_info
+            .try_into()
+            .expect("error making key");
+        let verify_info = VerifyInfo::new(msg.into(), sig);
+        let res = key.verify(&verify_info);
+        if cfg!(feature = "strict") {
+            assert_eq!(res, Err(Error::Verification));
+        } else {
+            assert_eq!(res, Ok(()));
+        }
     }
 
     #[cfg(feature = "sha2")]
@@ -26,9 +45,15 @@ mod k256_tests {
 
     #[cfg(all(feature = "sha2", feature = "x509"))]
     #[test]
-    fn x509_k256_with_sha256_good() {
+    fn x509_k256_with_sha256_good_if_not_strict() {
         let cert = read_pem!(Certificate, "testdata/secp256k1-sha256-crt.pem");
-        x509_verify_good(&cert, &cert);
+        let key = VerifyingKey::try_from(&cert).unwrap();
+        let res = key.verify(&cert);
+        if cfg!(feature = "strict") {
+            assert_eq!(res, Err(Error::Verification));
+        } else {
+            assert_eq!(res, Ok(()));
+        }
     }
 
     #[cfg(all(feature = "sha2", feature = "x509"))]

@@ -69,7 +69,7 @@ where
 }
 
 /// [`VerifyInfo`] with references to both message bytes and signature data
-pub type VerifyInfoRef<'a, 'b, 'c> = VerifyInfo<'a, &'c [u8], &'b [u8]>;
+pub type VerifyInfoRef<'a, 'b, 'c> = VerifyInfo<'a, &'b [u8], &'c [u8]>;
 
 impl<'a, 'b, 'c> From<&VerifyInfoRef<'a, 'b, 'c>> for VerifyInfoRef<'a, 'b, 'c> {
     fn from(other: &VerifyInfoRef<'a, 'b, 'c>) -> Self {
@@ -77,7 +77,7 @@ impl<'a, 'b, 'c> From<&VerifyInfoRef<'a, 'b, 'c>> for VerifyInfoRef<'a, 'b, 'c> 
     }
 }
 
-impl<'a, 'b, 'c> From<&'c VerifyInfo<'a, Vec<u8>, &'b [u8]>> for VerifyInfoRef<'a, 'b, 'c> {
+impl<'a, 'b, 'c> From<&'b VerifyInfo<'a, Vec<u8>, &'c [u8]>> for VerifyInfoRef<'a, 'b, 'c> {
     /// Converts the owned [`Message`] in [`VerifyInfo`] to a referenced [`Message`]
     ///
     /// Under normal circumstances, [`Message`] will own the encoded DER of the X.509 structure
@@ -86,7 +86,30 @@ impl<'a, 'b, 'c> From<&'c VerifyInfo<'a, Vec<u8>, &'b [u8]>> for VerifyInfoRef<'
     ///
     /// On the other hand, the internal [`Signature`] is typically referenced as the signature
     /// data itself lives in the X.509 structure.
-    fn from(other: &'c VerifyInfo<'a, Vec<u8>, &'b [u8]>) -> Self {
+    fn from(other: &'b VerifyInfo<'a, Vec<u8>, &'c [u8]>) -> Self {
+        VerifyInfo::new(other.message().into(), other.signature().into())
+    }
+}
+
+impl<'a, 'b> From<&'b VerifyInfo<'a, Vec<u8>, Vec<u8>>> for VerifyInfoRef<'a, 'b, 'b> {
+    fn from(other: &'b VerifyInfo<'a, Vec<u8>, Vec<u8>>) -> Self {
+        VerifyInfo::new(other.message().into(), other.signature().into())
+    }
+}
+
+impl<'a> From<&'a VerifyInfo<'a, &'a [u8], Vec<u8>>> for VerifyInfoRef<'a, 'a, 'a> {
+    /// Rust compiler did not accept the appropriate lifetimes.
+    ///
+    /// Lifetimes should be:
+    ///
+    /// 'a: self.sig.algorithm<'a>    (AlgorithmIdentifierRef<'a>)
+    /// 'b: self.msg.0<'b>            (Borrowed &'b [u8])
+    /// 'c: &'c self.sig.data<owned>  (Owned Vec<u8>)
+    ///
+    /// If `'a` goes out of scope, it takes `'c` with it (and vice-versa). But `'b` _may_ be able
+    /// to go out of scope depending on how the Rust borrow checker handles it. Use with caution.
+    #[must_use = "warning: possible bad lifetimes"]
+    fn from(other: &'a VerifyInfo<'a, &'a [u8], Vec<u8>>) -> Self {
         VerifyInfo::new(other.message().into(), other.signature().into())
     }
 }
