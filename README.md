@@ -177,7 +177,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 | ed25519 | ✔️ | Ed25519 signatures |
 | x509 | | enables X.509 structure conversion |
 | pem | | adds the `DecodePem` trait to X.509 reimports |
-| strict | | do not normalize elliptic curve signatures |
+| strict | | assert non-malleability of elliptic curve signatures |
 
 ## License
 
