@@ -179,15 +179,6 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 | pem | | adds the `DecodePem` trait to X.509 reimports |
 | strict | | assert non-malleability of elliptic curve signatures |
 
-### Non-malleability
-
-The elliptic curve algorithm has 2 valid signatures for each message: `(r, s)` and `(r, -s)`.
-Arguably, the distiction between them is unnecessary. However, there are some theoretical attacks
-that take advantage of the malleability of elliptic curve signatures--particularly within the
-blockchain and cryptocurrency applications. The `strict` feature can be used to assert _canonical_,
-low-S signatures. Enabling this will return a verification error when the signature value is high-S
-even if it is computationally correct. Affects verification of `ecdsa` and `ed25519`.
-
 ## License
 
 At your discretion:
