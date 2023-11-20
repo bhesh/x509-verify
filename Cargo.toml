@@ -57,6 +57,7 @@ ed25519 = [ "sha2", "dep:ed25519-dalek" ]
 x509 = [ "dep:x509-cert", "dep:ocsp-x509" ]
 pem = [ "x509", "der/pem", "x509-cert?/pem" ]
 strict = []
+std = []
 
 [package.metadata.docs.rs]
 all-features = true
