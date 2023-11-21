@@ -56,7 +56,7 @@ ecdsa = ["k256", "p192", "p224", "p256", "p384"]
 ed25519 = ["sha2", "dep:ed25519-dalek"]
 x509 = ["dep:x509-cert", "dep:ocsp-x509"]
 pem = ["x509", "der/pem", "x509-cert?/pem"]
-std = ["x509-cert/std"]
+std = ["x509-cert?/std"]
 
 [package.metadata.docs.rs]
 all-features = true
