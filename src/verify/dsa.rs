@@ -1,7 +1,7 @@
 //! DSA VerifyingKey
 
 use crate::{Error, Signature};
-use const_oid::AssociatedOid;
+use const_oid::{db::rfc5912::ID_DSA, AssociatedOid};
 use der::{asn1::ObjectIdentifier, Encode};
 use dsa::{Signature as DsaSignature, VerifyingKey};
 use spki::{DecodePublicKey, SubjectPublicKeyInfoRef};
@@ -13,16 +13,16 @@ use ::signature::{digest::Digest, hazmat::PrehashVerifier};
 use sha1::Sha1;
 
 #[cfg(feature = "sha1")]
-const DSA_WITH_SHA_1: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10040.4.3");
+use const_oid::db::rfc5912::DSA_WITH_SHA_1;
 
 #[cfg(feature = "sha2")]
 use sha2::{Sha224, Sha256};
 
 #[cfg(feature = "sha2")]
-const DSA_WITH_SHA_224: ObjectIdentifier = ObjectIdentifier::new_unwrap("2.16.840.1.101.3.4.3.1");
+use const_oid::db::rfc5912::DSA_WITH_SHA_224;
 
 #[cfg(feature = "sha2")]
-const DSA_WITH_SHA_256: ObjectIdentifier = ObjectIdentifier::new_unwrap("2.16.840.1.101.3.4.3.2");
+use const_oid::db::rfc5912::DSA_WITH_SHA_256;
 
 #[allow(dead_code)]
 #[derive(Clone, Debug)]
@@ -31,8 +31,7 @@ pub struct DsaVerifyingKey {
 }
 
 impl AssociatedOid for DsaVerifyingKey {
-    // ID_DSA
-    const OID: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10040.4.1");
+    const OID: ObjectIdentifier = ID_DSA;
 }
 
 impl TryFrom<SubjectPublicKeyInfoRef<'_>> for DsaVerifyingKey {

@@ -1,7 +1,7 @@
 //! RSA VerifyingKey
 
 use crate::{Error, Signature};
-use const_oid::AssociatedOid;
+use const_oid::{db::rfc5912::RSA_ENCRYPTION, AssociatedOid};
 use der::{asn1::ObjectIdentifier, Encode};
 use rsa::RsaPublicKey;
 use spki::{DecodePublicKey, SubjectPublicKeyInfoRef};
@@ -16,41 +16,34 @@ use ::signature::digest::Digest;
 use md2::Md2;
 
 #[cfg(feature = "md2")]
-const MD_2_WITH_RSA_ENCRYPTION: ObjectIdentifier =
-    ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.2");
+use const_oid::db::rfc5912::MD_2_WITH_RSA_ENCRYPTION;
 
 #[cfg(feature = "md5")]
 use md5::Md5;
 
 #[cfg(feature = "md5")]
-const MD_5_WITH_RSA_ENCRYPTION: ObjectIdentifier =
-    ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.4");
+use const_oid::db::rfc5912::MD_5_WITH_RSA_ENCRYPTION;
 
 #[cfg(feature = "sha1")]
 use sha1::Sha1;
 
 #[cfg(feature = "sha1")]
-const SHA_1_WITH_RSA_ENCRYPTION: ObjectIdentifier =
-    ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.5");
+use const_oid::db::rfc5912::SHA_1_WITH_RSA_ENCRYPTION;
 
 #[cfg(feature = "sha2")]
 use sha2::{Sha224, Sha256, Sha384, Sha512};
 
 #[cfg(feature = "sha2")]
-const SHA_224_WITH_RSA_ENCRYPTION: ObjectIdentifier =
-    ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.14");
+use const_oid::db::rfc5912::SHA_224_WITH_RSA_ENCRYPTION;
 
 #[cfg(feature = "sha2")]
-const SHA_256_WITH_RSA_ENCRYPTION: ObjectIdentifier =
-    ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.11");
+use const_oid::db::rfc5912::SHA_256_WITH_RSA_ENCRYPTION;
 
 #[cfg(feature = "sha2")]
-const SHA_384_WITH_RSA_ENCRYPTION: ObjectIdentifier =
-    ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.12");
+use const_oid::db::rfc5912::SHA_384_WITH_RSA_ENCRYPTION;
 
 #[cfg(feature = "sha2")]
-const SHA_512_WITH_RSA_ENCRYPTION: ObjectIdentifier =
-    ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.13");
+use const_oid::db::rfc5912::SHA_512_WITH_RSA_ENCRYPTION;
 
 #[allow(dead_code)]
 #[derive(Clone, Debug)]
@@ -59,8 +52,7 @@ pub struct RsaVerifyingKey {
 }
 
 impl AssociatedOid for RsaVerifyingKey {
-    // RSA_ENCRYPTION
-    const OID: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.113549.1.1.1");
+    const OID: ObjectIdentifier = RSA_ENCRYPTION;
 }
 
 impl TryFrom<SubjectPublicKeyInfoRef<'_>> for RsaVerifyingKey {

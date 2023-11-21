@@ -1,15 +1,11 @@
 //! EdDSA VerifyingKey
 
 use crate::{Error, Signature};
-use const_oid::AssociatedOid;
+use const_oid::{db::rfc8410::ID_ED_25519, AssociatedOid};
 use der::asn1::ObjectIdentifier;
 use ed25519_dalek::{Signature as Ed25519Signature, VerifyingKey};
 use signature::Verifier;
 use spki::SubjectPublicKeyInfoRef;
-
-// 1.3.6.1.4.1.11591.15.1 Another ed25519?
-#[cfg(feature = "ed25519")]
-const ID_ED25519: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.3.101.112");
 
 #[derive(Clone, Debug)]
 pub struct Ed25519VerifyingKey {
@@ -17,8 +13,7 @@ pub struct Ed25519VerifyingKey {
 }
 
 impl AssociatedOid for Ed25519VerifyingKey {
-    // ID_EC_PUBLIC_KEY
-    const OID: ObjectIdentifier = ID_ED25519;
+    const OID: ObjectIdentifier = ID_ED_25519;
 }
 
 impl TryFrom<SubjectPublicKeyInfoRef<'_>> for Ed25519VerifyingKey {

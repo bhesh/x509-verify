@@ -1,7 +1,7 @@
 //! ECDSA VerifyingKey
 
 use crate::{Error, Signature};
-use const_oid::AssociatedOid;
+use const_oid::{db::rfc5912::ID_EC_PUBLIC_KEY, AssociatedOid};
 use der::asn1::ObjectIdentifier;
 use ecdsa::{Signature as EcdsaSignature, VerifyingKey};
 use spki::SubjectPublicKeyInfoRef;
@@ -16,28 +16,28 @@ const SECP_256_K_1: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.3.132.0.1
 const SECP_192_R_1: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.3.1.1");
 
 #[cfg(feature = "p224")]
-const SECP_224_R_1: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.3.132.0.33");
+use const_oid::db::rfc5912::SECP_224_R_1;
 
 #[cfg(feature = "p256")]
-const SECP_256_R_1: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.3.1.7");
+use const_oid::db::rfc5912::SECP_256_R_1;
 
 #[cfg(feature = "p384")]
-const SECP_384_R_1: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.3.132.0.34");
+use const_oid::db::rfc5912::SECP_384_R_1;
 
 #[cfg(feature = "sha2")]
 use sha2::{Sha224, Sha256, Sha384, Sha512};
 
 #[cfg(feature = "sha2")]
-const ECDSA_WITH_SHA_224: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.4.3.1");
+use const_oid::db::rfc5912::ECDSA_WITH_SHA_224;
 
 #[cfg(feature = "sha2")]
-const ECDSA_WITH_SHA_256: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.4.3.2");
+use const_oid::db::rfc5912::ECDSA_WITH_SHA_256;
 
 #[cfg(feature = "sha2")]
-const ECDSA_WITH_SHA_384: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.4.3.3");
+use const_oid::db::rfc5912::ECDSA_WITH_SHA_384;
 
 #[cfg(feature = "sha2")]
-const ECDSA_WITH_SHA_512: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.4.3.4");
+use const_oid::db::rfc5912::ECDSA_WITH_SHA_512;
 
 #[derive(Clone, Debug)]
 pub enum EcdsaVerifyingKey {
@@ -163,8 +163,7 @@ impl EcdsaVerifyingKey {
 }
 
 impl AssociatedOid for EcdsaVerifyingKey {
-    // ID_EC_PUBLIC_KEY
-    const OID: ObjectIdentifier = ObjectIdentifier::new_unwrap("1.2.840.10045.2.1");
+    const OID: ObjectIdentifier = ID_EC_PUBLIC_KEY;
 }
 
 impl TryFrom<SubjectPublicKeyInfoRef<'_>> for EcdsaVerifyingKey {
