@@ -236,6 +236,58 @@ impl VerifyingKey {
             VerifyingKey::Fail => unreachable!(),
         }
     }
+
+    /// Verifies the signature given the [`VerifyInfo`]. Does not normalize ECDSA and EdDSA
+    /// signatures prior to verification.
+    #[allow(unused_variables, clippy::useless_conversion)]
+    pub fn verify_strict<'a, V, M, S>(&self, verify_info: V) -> Result<(), Error>
+    where
+        V: TryInto<VerifyInfo<'a, M, S>>,
+        V::Error: Into<Error>,
+        M: AsRef<[u8]>,
+        S: AsRef<[u8]>,
+    {
+        let verify_info = verify_info.try_into().map_err(|e| e.into())?;
+        match self {
+            #[cfg(feature = "dsa")]
+            VerifyingKey::Dsa(k) => k
+                .verify(verify_info.message(), verify_info.signature())
+                .map_err(|e| e.into()),
+
+            #[cfg(feature = "rsa")]
+            VerifyingKey::Rsa(k) => k
+                .verify(verify_info.message(), verify_info.signature())
+                .map_err(|e| e.into()),
+
+            #[cfg(any(
+                feature = "k256",
+                feature = "p192",
+                feature = "p224",
+                feature = "p256",
+                feature = "p384"
+            ))]
+            VerifyingKey::Ecdsa(k) => k
+                .verify_strict(verify_info.message(), verify_info.signature())
+                .map_err(|e| e.into()),
+
+            #[cfg(feature = "ed25519")]
+            VerifyingKey::Ed25519(k) => k
+                .verify_strict(verify_info.message(), verify_info.signature())
+                .map_err(|e| e.into()),
+
+            #[cfg(not(any(
+                feature = "dsa",
+                feature = "rsa",
+                feature = "k256",
+                feature = "p192",
+                feature = "p224",
+                feature = "p256",
+                feature = "p384",
+                feature = "ed25519"
+            )))]
+            VerifyingKey::Fail => unreachable!(),
+        }
+    }
 }
 
 impl TryFrom<SubjectPublicKeyInfoRef<'_>> for VerifyingKey {

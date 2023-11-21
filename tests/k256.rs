@@ -11,7 +11,7 @@ mod k256_tests {
 
     #[cfg(feature = "sha2")]
     #[test]
-    fn k256_with_sha256_good_if_not_strict() {
+    fn k256_with_sha256_good() {
         let cert = read_pem!(Certificate, "testdata/secp256k1-sha256-crt.pem");
         let msg = cert
             .tbs_certificate
@@ -30,11 +30,9 @@ mod k256_tests {
             .expect("error making key");
         let verify_info = VerifyInfo::new(msg.into(), sig);
         let res = key.verify(&verify_info);
-        if cfg!(feature = "strict") {
-            assert_eq!(res, Err(Error::Verification));
-        } else {
-            assert_eq!(res, Ok(()));
-        }
+        assert_eq!(res, Ok(()));
+        let res = key.verify_strict(&verify_info);
+        assert_eq!(res, Err(Error::Verification));
     }
 
     #[cfg(feature = "sha2")]
@@ -45,15 +43,13 @@ mod k256_tests {
 
     #[cfg(all(feature = "sha2", feature = "x509"))]
     #[test]
-    fn x509_k256_with_sha256_good_if_not_strict() {
+    fn x509_k256_with_sha256_good() {
         let cert = read_pem!(Certificate, "testdata/secp256k1-sha256-crt.pem");
         let key = VerifyingKey::try_from(&cert).unwrap();
         let res = key.verify(&cert);
-        if cfg!(feature = "strict") {
-            assert_eq!(res, Err(Error::Verification));
-        } else {
-            assert_eq!(res, Ok(()));
-        }
+        assert_eq!(res, Ok(()));
+        let res = key.verify_strict(&cert);
+        assert_eq!(res, Err(Error::Verification));
     }
 
     #[cfg(all(feature = "sha2", feature = "x509"))]

@@ -38,22 +38,23 @@ impl Ed25519VerifyingKey {
     where
         S: AsRef<[u8]>,
     {
-        if cfg!(feature = "strict") {
-            self.key
-                .verify_strict(
-                    msg,
-                    &Ed25519Signature::from_slice(signature.data())
-                        .or(Err(Error::InvalidSignature))?,
-                )
-                .or(Err(Error::Verification))
-        } else {
-            self.key
-                .verify(
-                    msg,
-                    &Ed25519Signature::from_slice(signature.data())
-                        .or(Err(Error::InvalidSignature))?,
-                )
-                .or(Err(Error::Verification))
-        }
+        self.key
+            .verify(
+                msg,
+                &Ed25519Signature::from_slice(signature.data()).or(Err(Error::InvalidSignature))?,
+            )
+            .or(Err(Error::Verification))
+    }
+
+    pub fn verify_strict<S>(&self, msg: &[u8], signature: &Signature<'_, S>) -> Result<(), Error>
+    where
+        S: AsRef<[u8]>,
+    {
+        self.key
+            .verify_strict(
+                msg,
+                &Ed25519Signature::from_slice(signature.data()).or(Err(Error::InvalidSignature))?,
+            )
+            .or(Err(Error::Verification))
     }
 }

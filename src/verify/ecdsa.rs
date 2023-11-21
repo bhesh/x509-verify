@@ -67,7 +67,6 @@ impl EcdsaVerifyingKey {
             Self::K256(pk) => {
                 let sig = EcdsaSignature::<k256::Secp256k1>::from_der(signature.data())
                     .or(Err(Error::InvalidSignature))?;
-                #[cfg(not(feature = "strict"))]
                 let sig = sig.normalize_s().unwrap_or(sig);
                 pk.verify_prehash(prehash, &sig)
                     .or(Err(Error::Verification))
@@ -77,7 +76,6 @@ impl EcdsaVerifyingKey {
             Self::P192(pk) => {
                 let sig = EcdsaSignature::<p192::NistP192>::from_der(signature.data())
                     .or(Err(Error::InvalidSignature))?;
-                #[cfg(not(feature = "strict"))]
                 let sig = sig.normalize_s().unwrap_or(sig);
                 pk.verify_prehash(prehash, &sig)
                     .or(Err(Error::Verification))
@@ -87,7 +85,6 @@ impl EcdsaVerifyingKey {
             Self::P224(pk) => {
                 let sig = EcdsaSignature::<p224::NistP224>::from_der(signature.data())
                     .or(Err(Error::InvalidSignature))?;
-                #[cfg(not(feature = "strict"))]
                 let sig = sig.normalize_s().unwrap_or(sig);
                 pk.verify_prehash(prehash, &sig)
                     .or(Err(Error::Verification))
@@ -97,7 +94,6 @@ impl EcdsaVerifyingKey {
             Self::P256(pk) => {
                 let sig = EcdsaSignature::<p256::NistP256>::from_der(signature.data())
                     .or(Err(Error::InvalidSignature))?;
-                #[cfg(not(feature = "strict"))]
                 let sig = sig.normalize_s().unwrap_or(sig);
                 pk.verify_prehash(prehash, &sig)
                     .or(Err(Error::Verification))
@@ -107,8 +103,58 @@ impl EcdsaVerifyingKey {
             Self::P384(pk) => {
                 let sig = EcdsaSignature::<p384::NistP384>::from_der(signature.data())
                     .or(Err(Error::InvalidSignature))?;
-                #[cfg(not(feature = "strict"))]
                 let sig = sig.normalize_s().unwrap_or(sig);
+                pk.verify_prehash(prehash, &sig)
+                    .or(Err(Error::Verification))
+            }
+        }
+    }
+
+    fn verify_prehash_strict<S>(
+        &self,
+        prehash: &[u8],
+        signature: &Signature<'_, S>,
+    ) -> Result<(), Error>
+    where
+        S: AsRef<[u8]>,
+    {
+        match &self {
+            #[cfg(feature = "k256")]
+            Self::K256(pk) => {
+                let sig = EcdsaSignature::<k256::Secp256k1>::from_der(signature.data())
+                    .or(Err(Error::InvalidSignature))?;
+                pk.verify_prehash(prehash, &sig)
+                    .or(Err(Error::Verification))
+            }
+
+            #[cfg(feature = "p192")]
+            Self::P192(pk) => {
+                let sig = EcdsaSignature::<p192::NistP192>::from_der(signature.data())
+                    .or(Err(Error::InvalidSignature))?;
+                pk.verify_prehash(prehash, &sig)
+                    .or(Err(Error::Verification))
+            }
+
+            #[cfg(feature = "p224")]
+            Self::P224(pk) => {
+                let sig = EcdsaSignature::<p224::NistP224>::from_der(signature.data())
+                    .or(Err(Error::InvalidSignature))?;
+                pk.verify_prehash(prehash, &sig)
+                    .or(Err(Error::Verification))
+            }
+
+            #[cfg(feature = "p256")]
+            Self::P256(pk) => {
+                let sig = EcdsaSignature::<p256::NistP256>::from_der(signature.data())
+                    .or(Err(Error::InvalidSignature))?;
+                pk.verify_prehash(prehash, &sig)
+                    .or(Err(Error::Verification))
+            }
+
+            #[cfg(feature = "p384")]
+            Self::P384(pk) => {
+                let sig = EcdsaSignature::<p384::NistP384>::from_der(signature.data())
+                    .or(Err(Error::InvalidSignature))?;
                 pk.verify_prehash(prehash, &sig)
                     .or(Err(Error::Verification))
             }
@@ -187,6 +233,27 @@ impl EcdsaVerifyingKey {
 
             #[cfg(feature = "sha2")]
             &ECDSA_WITH_SHA_512 => self.verify_prehash(&Sha512::digest(msg), signature),
+
+            oid => Err(Error::UnknownOid(*oid)),
+        }
+    }
+
+    pub fn verify_strict<S>(&self, msg: &[u8], signature: &Signature<'_, S>) -> Result<(), Error>
+    where
+        S: AsRef<[u8]>,
+    {
+        match signature.oid() {
+            #[cfg(feature = "sha2")]
+            &ECDSA_WITH_SHA_224 => self.verify_prehash_strict(&Sha224::digest(msg), signature),
+
+            #[cfg(feature = "sha2")]
+            &ECDSA_WITH_SHA_256 => self.verify_prehash_strict(&Sha256::digest(msg), signature),
+
+            #[cfg(feature = "sha2")]
+            &ECDSA_WITH_SHA_384 => self.verify_prehash_strict(&Sha384::digest(msg), signature),
+
+            #[cfg(feature = "sha2")]
+            &ECDSA_WITH_SHA_512 => self.verify_prehash_strict(&Sha512::digest(msg), signature),
 
             oid => Err(Error::UnknownOid(*oid)),
         }
