@@ -1,6 +1,6 @@
 [package]
 name = "x509-verify"
-version = "0.4.4"
+version = "0.4.5"
 description = """
 Pure Rust library that verifies X.509 signatures based on the algorithm identifiers
 """
@@ -14,27 +14,27 @@ edition = "2021"
 rust-version = "1.65"
 
 [dependencies]
-const-oid = { version = "0.9.5", default-features = false, features = ["db"] }
+const-oid = { version = "0.9.6", default-features = false, features = ["db"] }
 der = { version = "0.7.8", default-features = false, features = ["derive", "oid"] }
 signature = { version = "2.2.0", default-features = false, features = ["digest"] }
-spki = { version = "0.7.2", default-features = false, features = ["alloc"] }
+spki = { version = "0.7.3", default-features = false, features = ["alloc"] }
 
 # optional dependencies
 md2 = { version = "0.10.2", optional = true, default-features = false, features = ["oid"] }
 md-5 = { version = "0.10.6", optional = true, default-features = false, features = ["oid"] }
 sha1 = { version = "0.10.6", optional = true, default-features = false, features = ["oid"] }
 sha2 = { version = "0.10.8", optional = true, default-features = false, features = ["oid"] }
-rsa = { version = "0.9.4", optional = true, default-features = false }
+rsa = { version = "0.9.6", optional = true, default-features = false }
 dsa = { version = "0.6.2", optional = true, default-features = false }
 ecdsa = { version = "0.16.9", optional = true, default-features = false, features = ["verifying"] }
-k256 = { version = "0.13.2", optional = true, default-features = false, features = ["ecdsa"] }
+k256 = { version = "0.13.3", optional = true, default-features = false, features = ["ecdsa"] }
 p192 = { version = "0.13.0", optional = true, default-features = false, features = ["ecdsa"] }
 p224 = { version = "0.13.2", optional = true, default-features = false, features = ["ecdsa"] }
 p256 = { version = "0.13.2", optional = true, default-features = false, features = ["ecdsa"] }
 p384 = { version = "0.13.0", optional = true, default-features = false, features = ["ecdsa"] }
 ed25519-dalek = { version = "2.1.0", optional = true, default-features = false }
-x509-cert = { version = "0.2.4", optional = true, default-features = false }
-ocsp-x509 = { version = "0.1.2", optional = true, default-features = false }
+x509-cert = { version = "0.2.5", optional = true, default-features = false }
+x509-ocsp = { version = "0.2.1", optional = true, default-features = false }
 
 [dev-dependencies]
 x509-cert = { version = "0.2.4", default-features = false, features = ["pem"] }
@@ -54,7 +54,7 @@ p256 = ["sha2", "dep:ecdsa", "dep:p256"]
 p384 = ["sha2", "dep:ecdsa", "dep:p384"]
 ecdsa = ["k256", "p192", "p224", "p256", "p384"]
 ed25519 = ["sha2", "dep:ed25519-dalek"]
-x509 = ["dep:x509-cert", "dep:ocsp-x509"]
+x509 = ["dep:x509-cert", "dep:x509-ocsp"]
 pem = ["x509", "der/pem", "x509-cert?/pem"]
 std = ["x509-cert?/std"]
 

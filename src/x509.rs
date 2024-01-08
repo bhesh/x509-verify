@@ -4,8 +4,8 @@ use crate::{Error, MessageOwned, SignatureRef, VerifyInfo, VerifyingKey};
 use alloc::vec::Vec;
 use core::result::Result;
 use der::{referenced::OwnedToRef, Encode};
-use ocsp_x509::{BasicOcspResponse, OcspRequest};
 use x509_cert::{crl::CertificateList, request::CertReq, Certificate};
+use x509_ocsp::{BasicOcspResponse, OcspRequest};
 
 macro_rules! impl_as_message {
     ($from:ty, $msg:ident) => {

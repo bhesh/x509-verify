@@ -5,9 +5,9 @@ mod helpers;
 mod x509_tests {
     use crate::{helpers::*, *};
     use der::{Decode, DecodePem};
-    use ocsp_x509::{BasicOcspResponse, OcspResponse};
     use std::io::Read;
     use x509_cert::{crl::CertificateList, request::CertReq, Certificate};
+    use x509_ocsp::{BasicOcspResponse, OcspResponse};
 
     #[cfg(all(feature = "rsa", feature = "sha1"))]
     #[test]

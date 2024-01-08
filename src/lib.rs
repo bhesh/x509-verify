@@ -35,7 +35,7 @@ pub use spki;
 mod x509;
 
 #[cfg(feature = "x509")]
-pub use ocsp_x509 as x509_ocsp;
+pub use x509_ocsp;
 
 #[cfg(feature = "x509")]
 pub use x509_cert;
