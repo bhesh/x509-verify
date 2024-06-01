@@ -1,10 +1,10 @@
 name: Workspace
 
 on:
-  push:
-    branches: [ "**" ]
   pull_request:
     branches: [ "**" ]
+  push:
+    branches: master
 
 env:
   CARGO_TERM_COLOR: always
@@ -16,18 +16,19 @@ jobs:
     name: Clippy checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@1.73.0
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
         with:
+          toolchain: 1.75.0
           components: clippy
-      - run: cargo clippy --all-features
+      - run: cargo clippy --all --all-features --tests
 
   doc:
     name: Doc checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
       - run: cargo doc --workspace --all-features
@@ -36,8 +37,8 @@ jobs:
     name: Format checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
           components: rustfmt

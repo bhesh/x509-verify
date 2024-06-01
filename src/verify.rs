@@ -115,6 +115,7 @@ impl<'a> From<&'a VerifyInfo<'a, &'a [u8], Vec<u8>>> for VerifyInfoRef<'a, 'a, '
 
 /// Structure used to verify a signature
 #[derive(Clone, Debug)]
+#[allow(unused_qualifications)]
 pub enum VerifyingKey {
     /// DSA Keys
     #[cfg(feature = "dsa")]
@@ -154,6 +155,7 @@ pub enum VerifyingKey {
 
 impl VerifyingKey {
     /// Creates a new [`VerifyingKey`] given the `SubjectPublicKeyInfo`
+    #[allow(unused_qualifications)]
     pub fn new(key_info: SubjectPublicKeyInfoRef<'_>) -> Result<Self, Error> {
         match &key_info.algorithm.oid {
             #[cfg(feature = "dsa")]

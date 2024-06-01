@@ -11,6 +11,7 @@ mod extending_tests {
     #[derive(Debug)]
     struct NewError;
 
+    #[allow(clippy::from_over_into)]
     impl Into<Error> for NewError {
         fn into(self) -> Error {
             Error::InvalidSignature
@@ -22,6 +23,7 @@ mod extending_tests {
         pub signature: SignatureRef<'a, 'b>,
     }
 
+    #[allow(clippy::from_over_into)]
     impl<'a, 'b> TryInto<VerifyInfo<'a, Vec<u8>, &'b [u8]>> for NewType<'a, 'b> {
         type Error = NewError;
 
