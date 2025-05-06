@@ -11,7 +11,7 @@ categories = ["cryptography", "no-std"]
 keywords = ["crypto", "x509"]
 readme = "README.md"
 edition = "2021"
-rust-version = "1.75"
+rust-version = "1.81"
 
 [dependencies]
 const-oid = { version = "0.9.6", default-features = false, features = ["db"] }
@@ -41,7 +41,7 @@ x509-ocsp = { version = "0.2.1", optional = true, default-features = false }
 x509-cert = { version = "0.2.5", default-features = false, features = ["pem"] }
 
 [features]
-default = ["sha2", "rsa", "k256", "p256", "p384", "ed25519"]
+default = ["sha2", "rsa", "k256", "p256", "p384", "p521", "ed25519"]
 md2 = ["dep:md2"]
 md5 = ["dep:md-5"]
 sha1 = ["dep:sha1"]
