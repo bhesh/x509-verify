@@ -60,6 +60,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 - [p224](https://github.com/RustCrypto/elliptic-curves/tree/master/p224)
 - [p256](https://github.com/RustCrypto/elliptic-curves/tree/master/p256)
 - [p384](https://github.com/RustCrypto/elliptic-curves/tree/master/p384)
+- [p521](https://github.com/RustCrypto/elliptic-curves/tree/master/p521)
 
 ## Verification
 
@@ -173,7 +174,8 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 | p224 | | secp224r1 ECDSA signatures |
 | p256 | ✔️ | secp256r1 ECDSA signatures |
 | p384 | ✔️ | secp384r1 ECDSA signatures |
-| ecdsa | | k256, p192, p224, p256, and p384 |
+| p521 | ✔️ | secp521r1 ECDSA signatures |
+| ecdsa | | k256, p192, p224, p256, p384, and p521 |
 | ed25519 | ✔️ | Ed25519 signatures |
 | x509 | | enables X.509 structure conversion |
 | pem | | adds the `DecodePem` trait to X.509 reimports |

@@ -24,6 +24,9 @@ use const_oid::db::rfc5912::SECP_256_R_1;
 #[cfg(feature = "p384")]
 use const_oid::db::rfc5912::SECP_384_R_1;
 
+#[cfg(feature = "p521")]
+use const_oid::db::rfc5912::SECP_521_R_1;
+
 #[cfg(feature = "sha2")]
 use sha2::{Sha224, Sha256, Sha384, Sha512};
 
@@ -55,6 +58,9 @@ pub enum EcdsaVerifyingKey {
 
     #[cfg(feature = "p384")]
     P384(VerifyingKey<p384::NistP384>),
+
+    #[cfg(feature = "p521")]
+    P521(VerifyingKey<p521::NistP521>),
 }
 
 impl EcdsaVerifyingKey {
@@ -102,6 +108,15 @@ impl EcdsaVerifyingKey {
             #[cfg(feature = "p384")]
             Self::P384(pk) => {
                 let sig = EcdsaSignature::<p384::NistP384>::from_der(signature.data())
+                    .or(Err(Error::InvalidSignature))?;
+                let sig = sig.normalize_s().unwrap_or(sig);
+                pk.verify_prehash(prehash, &sig)
+                    .or(Err(Error::Verification))
+            }
+
+            #[cfg(feature = "p521")]
+            Self::P521(pk) => {
+                let sig = EcdsaSignature::<p521::NistP521>::from_der(signature.data())
                     .or(Err(Error::InvalidSignature))?;
                 let sig = sig.normalize_s().unwrap_or(sig);
                 pk.verify_prehash(prehash, &sig)
@@ -158,6 +173,14 @@ impl EcdsaVerifyingKey {
                 pk.verify_prehash(prehash, &sig)
                     .or(Err(Error::Verification))
             }
+
+            #[cfg(feature = "p521")]
+            Self::P521(pk) => {
+                let sig = EcdsaSignature::<p521::NistP521>::from_der(signature.data())
+                    .or(Err(Error::InvalidSignature))?;
+                pk.verify_prehash(prehash, &sig)
+                    .or(Err(Error::Verification))
+            }
         }
     }
 }
@@ -206,6 +229,12 @@ impl TryFrom<SubjectPublicKeyInfoRef<'_>> for EcdsaVerifyingKey {
 
             #[cfg(feature = "p384")]
             &SECP_384_R_1 => Ok(Self::P384(
+                VerifyingKey::from_sec1_bytes(other.subject_public_key.raw_bytes())
+                    .or(Err(Error::InvalidKey))?,
+            )),
+
+            #[cfg(feature = "p521")]
+            &SECP_521_R_1 => Ok(Self::P521(
                 VerifyingKey::from_sec1_bytes(other.subject_public_key.raw_bytes())
                     .or(Err(Error::InvalidKey))?,
             )),
