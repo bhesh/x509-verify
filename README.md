@@ -67,7 +67,7 @@ Some of the features of this crate are in an early, experimental phase. Use at y
 ```rust
 #[cfg(all(feature = "rsa", feature = "sha2"))]
 {
-    use der::{DecodePem, Encode};
+    use der::{referenced::OwnedToRef, DecodePem, Encode};
     use std::fs;
     use x509_cert::Certificate;
     use x509_verify::{Signature, VerifyInfo, VerifyingKey};
@@ -77,21 +77,22 @@ Some of the features of this crate are in an early, experimental phase. Use at y
     let cert = Certificate::from_pem(&cert).unwrap();
 
     let verify_info = VerifyInfo::new(
-        cert.tbs_certificate
+        cert.tbs_certificate()
             .to_der()
             .unwrap()
             .into(),
         Signature::new(
-            &cert.signature_algorithm,
-            cert.signature
+            &cert.signature_algorithm(),
+            cert.signature()
                 .as_bytes()
                 .unwrap(),
         ),
     );
 
     let key: VerifyingKey = cert
-        .tbs_certificate
-        .subject_public_key_info
+        .tbs_certificate()
+        .subject_public_key_info()
+        .owned_to_ref()
         .try_into()
         .unwrap();
 
