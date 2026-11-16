@@ -50,8 +50,8 @@ impl TryFrom<&Certificate> for VerifyingKey {
     type Error = Error;
 
     fn try_from(cert: &Certificate) -> Result<Self, Self::Error> {
-        cert.tbs_certificate
-            .subject_public_key_info
+        cert.tbs_certificate()
+            .subject_public_key_info()
             .owned_to_ref()
             .try_into()
     }
@@ -65,8 +65,25 @@ impl TryFrom<Certificate> for VerifyingKey {
 }
 
 // Certificate
-impl_as_message!(Certificate, tbs_certificate);
-impl_as_signature!(Certificate, signature_algorithm, signature);
+impl TryFrom<&Certificate> for MessageOwned {
+    type Error = Error;
+
+    fn try_from(other: &Certificate) -> Result<Self, Self::Error> {
+        Ok(Self::from(
+            other.tbs_certificate().to_der().or(Err(Error::Encode))?,
+        ))
+    }
+}
+impl<'a> TryFrom<&'a Certificate> for SignatureRef<'a, 'a> {
+    type Error = Error;
+
+    fn try_from(other: &'a Certificate) -> Result<Self, Self::Error> {
+        Ok(SignatureRef::new(
+            &other.signature_algorithm(),
+            other.signature().as_bytes().ok_or(Error::Decode)?,
+        ))
+    }
+}
 impl_as_verify_info!(Certificate);
 
 // CertificateList

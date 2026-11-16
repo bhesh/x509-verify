@@ -23,18 +23,19 @@ macro_rules! read_pem {
 pub fn self_signed_good(filename: &str) {
     let cert = read_pem!(Certificate, filename);
     let msg = cert
-        .tbs_certificate
+        .tbs_certificate()
         .to_der()
         .expect("error encoding message");
     let sig = Signature::new(
-        &cert.signature_algorithm,
-        cert.signature
+        &cert.signature_algorithm(),
+        cert.signature()
             .as_bytes()
             .expect("signature is not octet-aligned"),
     );
     let key: VerifyingKey = cert
-        .tbs_certificate
-        .subject_public_key_info
+        .tbs_certificate()
+        .subject_public_key_info()
+        .owned_to_ref()
         .try_into()
         .expect("error making key");
     let verify_info = VerifyInfo::new(msg.into(), sig);
@@ -44,14 +45,15 @@ pub fn self_signed_good(filename: &str) {
 pub fn self_signed_bad(filename: &str) {
     let cert = read_pem!(Certificate, filename);
     let sig = Signature::new(
-        &cert.signature_algorithm,
-        cert.signature
+        &cert.signature_algorithm(),
+        cert.signature()
             .as_bytes()
             .expect("signature is not octet-aligned"),
     );
     let key: VerifyingKey = cert
-        .tbs_certificate
-        .subject_public_key_info
+        .tbs_certificate()
+        .subject_public_key_info()
+        .owned_to_ref()
         .try_into()
         .expect("error making key");
     let verify_info = VerifyInfo::new("".as_bytes().into(), sig);
@@ -65,13 +67,17 @@ pub fn self_signed_bad(filename: &str) {
 pub fn self_signed_bad_oid(filename: &str) {
     let cert = read_pem!(Certificate, filename);
     let sig = Signature::new(
-        &cert.signature_algorithm,
-        cert.signature
+        &cert.signature_algorithm(),
+        cert.signature()
             .as_bytes()
             .expect("signature is not octet-aligned"),
     );
     let verify_info = VerifyInfo::new("".as_bytes().into(), sig);
-    match VerifyingKey::try_from(cert.tbs_certificate.subject_public_key_info.owned_to_ref()) {
+    match VerifyingKey::try_from(
+        cert.tbs_certificate()
+            .subject_public_key_info()
+            .owned_to_ref(),
+    ) {
         Ok(key) => match key.verify(&verify_info) {
             Ok(_) => panic!("should not have been good"),
             Err(Error::UnknownOid(_)) => {}

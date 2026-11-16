@@ -2,9 +2,9 @@
 
 use crate::{Error, Signature};
 use const_oid::{db::rfc5912::RSA_ENCRYPTION, AssociatedOid};
-use der::{asn1::ObjectIdentifier, Encode};
-use rsa::RsaPublicKey;
-use spki::{DecodePublicKey, SubjectPublicKeyInfoRef};
+use der::asn1::ObjectIdentifier;
+use rsa::PublicKey;
+use spki::SubjectPublicKeyInfoRef;
 
 #[cfg(any(feature = "md2", feature = "md5", feature = "sha1", feature = "sha2"))]
 use rsa::Pkcs1v15Sign;
@@ -48,7 +48,7 @@ use const_oid::db::rfc5912::SHA_512_WITH_RSA_ENCRYPTION;
 #[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub struct RsaVerifyingKey {
-    key: RsaPublicKey,
+    key: PublicKey,
 }
 
 impl AssociatedOid for RsaVerifyingKey {
@@ -60,8 +60,7 @@ impl TryFrom<SubjectPublicKeyInfoRef<'_>> for RsaVerifyingKey {
 
     fn try_from(other: SubjectPublicKeyInfoRef<'_>) -> Result<Self, Self::Error> {
         Ok(Self {
-            key: RsaPublicKey::from_public_key_der(&other.to_der().or(Err(Error::Encode))?)
-                .or(Err(Error::InvalidKey))?,
+            key: PublicKey::try_from(other).or(Err(Error::InvalidKey))?,
         })
     }
 }

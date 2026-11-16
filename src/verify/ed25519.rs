@@ -3,8 +3,7 @@
 use crate::{Error, Signature};
 use const_oid::{db::rfc8410::ID_ED_25519, AssociatedOid};
 use der::asn1::ObjectIdentifier;
-use ed25519_dalek::{Signature as Ed25519Signature, VerifyingKey};
-use signature::Verifier;
+use ed25519_dalek::{Signature as Ed25519Signature, Verifier, VerifyingKey};
 use spki::SubjectPublicKeyInfoRef;
 
 #[derive(Clone, Debug)]
