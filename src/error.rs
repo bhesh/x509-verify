@@ -32,7 +32,7 @@ impl fmt::Display for Error {
             Error::Verification => write!(f, "Verification failure"),
             Error::InvalidKey => write!(f, "Invalid key"),
             Error::InvalidSignature => write!(f, "Invalid signature"),
-            Error::UnknownOid(oid) => write!(f, "Unknown OID: {}", oid),
+            Error::UnknownOid(oid) => write!(f, "Unknown OID: {oid}"),
             Error::Decode => write!(f, "Decode failure"),
             Error::Encode => write!(f, "Encode failure"),
         }
