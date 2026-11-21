@@ -2,9 +2,9 @@
 
 use crate::{Error, Signature};
 use const_oid::{db::rfc5912::ID_DSA, AssociatedOid};
-use der::{asn1::ObjectIdentifier, Encode};
+use der::asn1::ObjectIdentifier;
 use dsa::{Signature as DsaSignature, VerifyingKey};
-use spki::{DecodePublicKey, SubjectPublicKeyInfoRef};
+use spki::SubjectPublicKeyInfoRef;
 
 #[cfg(any(feature = "sha1", feature = "sha2"))]
 use ::signature::{digest::Digest, hazmat::PrehashVerifier};
@@ -39,8 +39,7 @@ impl TryFrom<SubjectPublicKeyInfoRef<'_>> for DsaVerifyingKey {
 
     fn try_from(other: SubjectPublicKeyInfoRef<'_>) -> Result<Self, Self::Error> {
         Ok(Self {
-            key: VerifyingKey::from_public_key_der(&other.to_der().or(Err(Error::Decode))?)
-                .or(Err(Error::InvalidKey))?,
+            key: VerifyingKey::try_from(other).or(Err(Error::InvalidKey))?,
         })
     }
 }

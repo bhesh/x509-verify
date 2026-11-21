@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         rust:
-          - 1.81.0
+          - 1.88.0
           - stable
         target:
           - thumbv7em-none-eabi
@@ -43,7 +43,7 @@ jobs:
     strategy:
       matrix:
         rust:
-          - 1.81.0
+          - 1.88.0
           - stable
     runs-on: ubuntu-latest
     steps:

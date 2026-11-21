@@ -73,7 +73,7 @@ impl EcdsaVerifyingKey {
             Self::K256(pk) => {
                 let sig = EcdsaSignature::<k256::Secp256k1>::from_der(signature.data())
                     .or(Err(Error::InvalidSignature))?;
-                let sig = sig.normalize_s().unwrap_or(sig);
+                let sig = sig.normalize_s();
                 pk.verify_prehash(prehash, &sig)
                     .or(Err(Error::Verification))
             }
@@ -82,7 +82,7 @@ impl EcdsaVerifyingKey {
             Self::P192(pk) => {
                 let sig = EcdsaSignature::<p192::NistP192>::from_der(signature.data())
                     .or(Err(Error::InvalidSignature))?;
-                let sig = sig.normalize_s().unwrap_or(sig);
+                let sig = sig.normalize_s();
                 pk.verify_prehash(prehash, &sig)
                     .or(Err(Error::Verification))
             }
@@ -91,7 +91,7 @@ impl EcdsaVerifyingKey {
             Self::P224(pk) => {
                 let sig = EcdsaSignature::<p224::NistP224>::from_der(signature.data())
                     .or(Err(Error::InvalidSignature))?;
-                let sig = sig.normalize_s().unwrap_or(sig);
+                let sig = sig.normalize_s();
                 pk.verify_prehash(prehash, &sig)
                     .or(Err(Error::Verification))
             }
@@ -100,7 +100,7 @@ impl EcdsaVerifyingKey {
             Self::P256(pk) => {
                 let sig = EcdsaSignature::<p256::NistP256>::from_der(signature.data())
                     .or(Err(Error::InvalidSignature))?;
-                let sig = sig.normalize_s().unwrap_or(sig);
+                let sig = sig.normalize_s();
                 pk.verify_prehash(prehash, &sig)
                     .or(Err(Error::Verification))
             }
@@ -109,7 +109,7 @@ impl EcdsaVerifyingKey {
             Self::P384(pk) => {
                 let sig = EcdsaSignature::<p384::NistP384>::from_der(signature.data())
                     .or(Err(Error::InvalidSignature))?;
-                let sig = sig.normalize_s().unwrap_or(sig);
+                let sig = sig.normalize_s();
                 pk.verify_prehash(prehash, &sig)
                     .or(Err(Error::Verification))
             }
@@ -118,7 +118,7 @@ impl EcdsaVerifyingKey {
             Self::P521(pk) => {
                 let sig = EcdsaSignature::<p521::NistP521>::from_der(signature.data())
                     .or(Err(Error::InvalidSignature))?;
-                let sig = sig.normalize_s().unwrap_or(sig);
+                let sig = sig.normalize_s();
                 pk.verify_prehash(prehash, &sig)
                     .or(Err(Error::Verification))
             }

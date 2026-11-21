@@ -107,7 +107,6 @@ impl<'a> From<&'a VerifyInfo<'a, &'a [u8], Vec<u8>>> for VerifyInfoRef<'a, 'a, '
     /// 'b: self.msg.0                (Borrowed &'b [u8])
     /// 'c: &'c self.sig.data         (Owned Vec<u8>)
     /// ```
-    #[must_use = "possible bad lifetimes"]
     fn from(other: &'a VerifyInfo<'a, &'a [u8], Vec<u8>>) -> Self {
         VerifyInfo::new(other.message().into(), other.signature().into())
     }
