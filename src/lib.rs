@@ -1,9 +1,12 @@
 #![no_std]
-#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 #![doc = include_str!("../README.md")]
 #![forbid(unsafe_code)]
 #![warn(
+    clippy::alloc_instead_of_core,
     clippy::mod_module_files,
+    clippy::std_instead_of_alloc,
+    clippy::std_instead_of_core,
     clippy::unwrap_used,
     missing_docs,
     rust_2018_idioms,
