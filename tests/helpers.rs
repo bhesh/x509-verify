@@ -27,7 +27,7 @@ pub fn self_signed_good(filename: &str) {
         .to_der()
         .expect("error encoding message");
     let sig = Signature::new(
-        &cert.signature_algorithm(),
+        cert.signature_algorithm(),
         cert.signature()
             .as_bytes()
             .expect("signature is not octet-aligned"),
@@ -45,7 +45,7 @@ pub fn self_signed_good(filename: &str) {
 pub fn self_signed_bad(filename: &str) {
     let cert = read_pem!(Certificate, filename);
     let sig = Signature::new(
-        &cert.signature_algorithm(),
+        cert.signature_algorithm(),
         cert.signature()
             .as_bytes()
             .expect("signature is not octet-aligned"),
@@ -67,7 +67,7 @@ pub fn self_signed_bad(filename: &str) {
 pub fn self_signed_bad_oid(filename: &str) {
     let cert = read_pem!(Certificate, filename);
     let sig = Signature::new(
-        &cert.signature_algorithm(),
+        cert.signature_algorithm(),
         cert.signature()
             .as_bytes()
             .expect("signature is not octet-aligned"),
