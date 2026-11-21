@@ -60,7 +60,7 @@ pub fn self_signed_bad(filename: &str) {
     match key.verify(&verify_info) {
         Ok(_) => panic!("should not have been good"),
         Err(Error::Verification) => {}
-        Err(e) => panic!("{:?}", e),
+        Err(e) => panic!("{e:?}"),
     }
 }
 
@@ -81,10 +81,10 @@ pub fn self_signed_bad_oid(filename: &str) {
         Ok(key) => match key.verify(&verify_info) {
             Ok(_) => panic!("should not have been good"),
             Err(Error::UnknownOid(_)) => {}
-            Err(e) => panic!("{:?}", e),
+            Err(e) => panic!("{e:?}"),
         },
         Err(Error::UnknownOid(_)) => {}
-        Err(e) => panic!("{:?}", e),
+        Err(e) => panic!("{e:?}"),
     }
 }
 
@@ -118,6 +118,6 @@ where
     match key.verify(&verify_info) {
         Ok(_) => panic!("should not have been good"),
         Err(Error::Verification) => {}
-        Err(e) => panic!("{:?}", e),
+        Err(e) => panic!("{e:?}"),
     }
 }
