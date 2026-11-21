@@ -79,7 +79,7 @@ impl<'a> TryFrom<&'a Certificate> for SignatureRef<'a, 'a> {
 
     fn try_from(other: &'a Certificate) -> Result<Self, Self::Error> {
         Ok(SignatureRef::new(
-            &other.signature_algorithm(),
+            other.signature_algorithm(),
             other.signature().as_bytes().ok_or(Error::Decode)?,
         ))
     }

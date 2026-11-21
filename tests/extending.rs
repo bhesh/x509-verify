@@ -38,7 +38,7 @@ mod extending_tests {
         let new_type = NewType {
             message: cert.tbs_certificate().to_der().unwrap(),
             signature: SignatureRef::new(
-                &cert.signature_algorithm(),
+                cert.signature_algorithm(),
                 cert.signature()
                     .as_bytes()
                     .expect("signature is not octet-aligned"),

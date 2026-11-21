@@ -11,7 +11,7 @@ categories = ["cryptography", "no-std"]
 keywords = ["crypto", "x509"]
 readme = "README.md"
 edition = "2021"
-rust-version = "1.81"
+rust-version = "1.88"
 
 [dependencies]
 const-oid = { version = "0.10.2", default-features = false, features = ["db"] }
@@ -24,21 +24,21 @@ md2 = { version = "0.11.0", optional = true, default-features = false, features 
 md-5 = { version = "0.11.0", optional = true, default-features = false, features = ["oid"] }
 sha1 = { version = "0.11.0", optional = true, default-features = false, features = ["oid"] }
 sha2 = { version = "0.11.0", optional = true, default-features = false, features = ["oid"] }
-rsa = { version = "0.10.0-rc.18", optional = true, default-features = false, features = ["encoding", "pkcs1v15"] }
-dsa = { version = "0.7.0-rc.15", optional = true, default-features = false, features = ["pkcs8"] }
-ecdsa = { version = "0.17.0-rc.18", optional = true, default-features = false, features = [] }
-k256 = { version = "0.14.0-rc.9", optional = true, default-features = false, features = ["ecdsa"] }
-p192 = { version = "0.14.0-rc.9", optional = true, default-features = false, features = ["ecdsa"] }
-p224 = { version = "0.14.0-rc.9", optional = true, default-features = false, features = ["ecdsa"] }
-p256 = { version = "0.14.0-rc.9", optional = true, default-features = false, features = ["ecdsa"] }
-p384 = { version = "0.14.0-rc.9", optional = true, default-features = false, features = ["ecdsa"] }
-p521 = { version = "0.14.0-rc.9", optional = true, default-features = false, features = ["ecdsa"] }
+rsa = { version = "0.10.0", optional = true, default-features = false, features = ["encoding", "pkcs1v15"] }
+dsa = { version = "0.7.0", optional = true, default-features = false, features = ["pkcs8"] }
+ecdsa = { version = "0.17.0", optional = true, default-features = false, features = [] }
+k256 = { version = "0.14.0", optional = true, default-features = false, features = ["ecdsa"] }
+p192 = { version = "0.14.0-rc.15", optional = true, default-features = false, features = ["ecdsa"] }
+p224 = { version = "0.14.0-rc.15", optional = true, default-features = false, features = ["ecdsa"] }
+p256 = { version = "0.14.0", optional = true, default-features = false, features = ["ecdsa"] }
+p384 = { version = "0.14.0", optional = true, default-features = false, features = ["ecdsa"] }
+p521 = { version = "0.14.0", optional = true, default-features = false, features = ["ecdsa"] }
 ed25519-dalek = { version = "3.0.0", optional = true, default-features = false }
-x509-cert = { version = "0.3.0-rc.4", optional = true, default-features = false }
+x509-cert = { version = "0.3.1", optional = true, default-features = false }
 x509-ocsp = { version = "0.3.0-rc.1", optional = true, default-features = false }
 
 [dev-dependencies]
-x509-cert = { version = "0.3.0-rc.4", default-features = false, features = ["pem"] }
+x509-cert = { version = "0.3.1", default-features = false, features = ["pem"] }
 
 [features]
 default = ["sha2", "rsa", "k256", "p256", "p384", "p521", "ed25519"]
